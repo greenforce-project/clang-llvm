@@ -11,10 +11,27 @@ function(llvm_ExternalProject_BuildCmd out_var target bin_dir)
     # Use special command for Makefiles to support parallelism.
     set(${out_var} "$(MAKE)" "-C" "${bin_dir}" "${target}" PARENT_SCOPE)
   else()
+    set(tool_args "${LLVM_EXTERNAL_PROJECT_BUILD_TOOL_ARGS}")
+    if(NOT tool_args STREQUAL "")
+      string(CONFIGURE "${tool_args}" tool_args @ONLY)
+      string(PREPEND tool_args "-- ")
+      separate_arguments(tool_args UNIX_COMMAND "${tool_args}")
+    endif()
     set(${out_var} ${CMAKE_COMMAND} --build ${bin_dir} --target ${target}
-                                    --config ${ARG_CONFIGURATION} PARENT_SCOPE)
+                                    --config ${ARG_CONFIGURATION} ${tool_args} PARENT_SCOPE)
   endif()
 endfunction()
+
+# is_msvc_triple(out_var triple)
+#   Checks whether the passed triple refers to an MSVC environment
+function(is_msvc_triple out_var triple)
+  if (triple MATCHES ".*-windows-msvc.*")
+    set(${out_var} TRUE PARENT_SCOPE)
+  else()
+    set(${out_var} FALSE PARENT_SCOPE)
+  endif()
+endfunction()
+
 
 # llvm_ExternalProject_Add(name source_dir ...
 #   USE_TOOLCHAIN
@@ -37,12 +54,14 @@ endfunction()
 #     Extra variable prefixes (name is always included) to pass down
 #   STRIP_TOOL path
 #     Use provided strip tool instead of the default one.
+#   TARGET_TRIPLE triple
+#     Optional target triple to pass to the compiler
 #   )
 function(llvm_ExternalProject_Add name source_dir)
   cmake_parse_arguments(ARG
     "USE_TOOLCHAIN;EXCLUDE_FROM_ALL;NO_INSTALL;ALWAYS_CLEAN"
     "SOURCE_DIR"
-    "CMAKE_ARGS;TOOLCHAIN_TOOLS;RUNTIME_LIBRARIES;DEPENDS;EXTRA_TARGETS;PASSTHROUGH_PREFIXES;STRIP_TOOL"
+    "CMAKE_ARGS;TOOLCHAIN_TOOLS;RUNTIME_LIBRARIES;DEPENDS;EXTRA_TARGETS;PASSTHROUGH_PREFIXES;STRIP_TOOL;TARGET_TRIPLE"
     ${ARGN})
   canonicalize_tool_name(${name} nameCanon)
 
@@ -52,11 +71,33 @@ function(llvm_ExternalProject_Add name source_dir)
     endif()
   endforeach()
 
+  # If CMAKE_SYSTEM_NAME is not set explicitly in the arguments passed to us,
+  # reflect CMake's own default.
+  if (NOT _cmake_system_name)
+    set(_cmake_system_name "${CMAKE_HOST_SYSTEM_NAME}")
+  endif()
+
+  if(NOT ARG_TARGET_TRIPLE)
+    set(target_triple ${LLVM_DEFAULT_TARGET_TRIPLE})
+  else()
+    set(target_triple ${ARG_TARGET_TRIPLE})
+  endif()
+
+  is_msvc_triple(is_msvc_target ${target_triple})
+
   if(NOT ARG_TOOLCHAIN_TOOLS)
-    set(ARG_TOOLCHAIN_TOOLS clang lld llvm-ar llvm-lipo llvm-ranlib llvm-nm llvm-objdump)
-    if(NOT _cmake_system_name STREQUAL Darwin)
-      # TODO: These tools don't fully support Mach-O format yet.
-      list(APPEND ARG_TOOLCHAIN_TOOLS llvm-objcopy llvm-strip)
+    set(ARG_TOOLCHAIN_TOOLS clang)
+    # AIX 64-bit XCOFF and big AR format is not yet supported in some of these tools.
+    if(NOT _cmake_system_name STREQUAL AIX)
+      list(APPEND ARG_TOOLCHAIN_TOOLS lld llvm-ar llvm-ranlib llvm-nm llvm-objdump)
+      if(_cmake_system_name STREQUAL Darwin)
+        list(APPEND ARG_TOOLCHAIN_TOOLS llvm-libtool-darwin llvm-lipo)
+      elseif(is_msvc_target)
+        list(APPEND ARG_TOOLCHAIN_TOOLS llvm-lib)
+      else()
+        # TODO: These tools don't fully support Mach-O format yet.
+        list(APPEND ARG_TOOLCHAIN_TOOLS llvm-objcopy llvm-strip llvm-readelf)
+      endif()
     endif()
   endif()
   foreach(tool ${ARG_TOOLCHAIN_TOOLS})
@@ -124,7 +165,7 @@ function(llvm_ExternalProject_Add name source_dir)
 
   if(ARG_USE_TOOLCHAIN AND NOT CMAKE_CROSSCOMPILING)
     if(CLANG_IN_TOOLCHAIN)
-      if(_cmake_system_name STREQUAL Windows)
+      if(is_msvc_target)
         set(compiler_args -DCMAKE_C_COMPILER=${LLVM_RUNTIME_OUTPUT_INTDIR}/clang-cl${CMAKE_EXECUTABLE_SUFFIX}
                           -DCMAKE_CXX_COMPILER=${LLVM_RUNTIME_OUTPUT_INTDIR}/clang-cl${CMAKE_EXECUTABLE_SUFFIX}
                           -DCMAKE_ASM_COMPILER=${LLVM_RUNTIME_OUTPUT_INTDIR}/clang-cl${CMAKE_EXECUTABLE_SUFFIX})
@@ -135,14 +176,21 @@ function(llvm_ExternalProject_Add name source_dir)
       endif()
     endif()
     if(lld IN_LIST TOOLCHAIN_TOOLS)
-      if(_cmake_system_name STREQUAL Windows)
+      if(is_msvc_target)
         list(APPEND compiler_args -DCMAKE_LINKER=${LLVM_RUNTIME_OUTPUT_INTDIR}/lld-link${CMAKE_EXECUTABLE_SUFFIX})
-      else()
+      elseif(NOT _cmake_system_name STREQUAL Darwin)
         list(APPEND compiler_args -DCMAKE_LINKER=${LLVM_RUNTIME_OUTPUT_INTDIR}/ld.lld${CMAKE_EXECUTABLE_SUFFIX})
       endif()
     endif()
     if(llvm-ar IN_LIST TOOLCHAIN_TOOLS)
-      list(APPEND compiler_args -DCMAKE_AR=${LLVM_RUNTIME_OUTPUT_INTDIR}/llvm-ar${CMAKE_EXECUTABLE_SUFFIX})
+      if(is_msvc_target)
+        list(APPEND compiler_args -DCMAKE_AR=${LLVM_RUNTIME_OUTPUT_INTDIR}/llvm-lib${CMAKE_EXECUTABLE_SUFFIX})
+      else()
+        list(APPEND compiler_args -DCMAKE_AR=${LLVM_RUNTIME_OUTPUT_INTDIR}/llvm-ar${CMAKE_EXECUTABLE_SUFFIX})
+      endif()
+    endif()
+    if(llvm-libtool-darwin IN_LIST TOOLCHAIN_TOOLS)
+      list(APPEND compiler_args -DCMAKE_LIBTOOL=${LLVM_RUNTIME_OUTPUT_INTDIR}/llvm-libtool-darwin${CMAKE_EXECUTABLE_SUFFIX})
     endif()
     if(llvm-lipo IN_LIST TOOLCHAIN_TOOLS)
       list(APPEND compiler_args -DCMAKE_LIPO=${LLVM_RUNTIME_OUTPUT_INTDIR}/llvm-lipo${CMAKE_EXECUTABLE_SUFFIX})
@@ -161,6 +209,9 @@ function(llvm_ExternalProject_Add name source_dir)
     endif()
     if(llvm-strip IN_LIST TOOLCHAIN_TOOLS AND NOT ARG_STRIP_TOOL)
       list(APPEND compiler_args -DCMAKE_STRIP=${LLVM_RUNTIME_OUTPUT_INTDIR}/llvm-strip${CMAKE_EXECUTABLE_SUFFIX})
+    endif()
+    if(llvm-readelf IN_LIST TOOLCHAIN_TOOLS)
+      list(APPEND compiler_args -DCMAKE_READELF=${LLVM_RUNTIME_OUTPUT_INTDIR}/llvm-readelf${CMAKE_EXECUTABLE_SUFFIX})
     endif()
     list(APPEND ARG_DEPENDS ${TOOLCHAIN_TOOLS})
   endif()
@@ -190,7 +241,8 @@ function(llvm_ExternalProject_Add name source_dir)
   endif()
 
   if(CMAKE_CROSSCOMPILING)
-    set(compiler_args -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+    set(compiler_args -DCMAKE_ASM_COMPILER=${CMAKE_ASM_COMPILER}
+                      -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
                       -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
                       -DCMAKE_LINKER=${CMAKE_LINKER}
                       -DCMAKE_AR=${CMAKE_AR}
@@ -198,7 +250,8 @@ function(llvm_ExternalProject_Add name source_dir)
                       -DCMAKE_NM=${CMAKE_NM}
                       -DCMAKE_OBJCOPY=${CMAKE_OBJCOPY}
                       -DCMAKE_OBJDUMP=${CMAKE_OBJDUMP}
-                      -DCMAKE_STRIP=${CMAKE_STRIP})
+                      -DCMAKE_STRIP=${CMAKE_STRIP}
+                      -DCMAKE_READELF=${CMAKE_READELF})
     set(llvm_config_path ${LLVM_CONFIG_PATH})
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -231,6 +284,12 @@ function(llvm_ExternalProject_Add name source_dir)
     set(cmake_args ${ARG_CMAKE_ARGS})
   endif()
 
+  if(ARG_TARGET_TRIPLE)
+    list(APPEND compiler_args -DCMAKE_C_COMPILER_TARGET=${ARG_TARGET_TRIPLE})
+    list(APPEND compiler_args -DCMAKE_CXX_COMPILER_TARGET=${ARG_TARGET_TRIPLE})
+    list(APPEND compiler_args -DCMAKE_ASM_COMPILER_TARGET=${ARG_TARGET_TRIPLE})
+  endif()
+
   ExternalProject_Add(${name}
     DEPENDS ${ARG_DEPENDS} llvm-config
     ${name}-clobber
@@ -250,10 +309,13 @@ function(llvm_ExternalProject_Add name source_dir)
                -DLLVM_HAVE_LINK_VERSION_SCRIPT=${LLVM_HAVE_LINK_VERSION_SCRIPT}
                -DLLVM_USE_RELATIVE_PATHS_IN_DEBUG_INFO=${LLVM_USE_RELATIVE_PATHS_IN_DEBUG_INFO}
                -DLLVM_USE_RELATIVE_PATHS_IN_FILES=${LLVM_USE_RELATIVE_PATHS_IN_FILES}
+               -DLLVM_LIT_ARGS=${LLVM_LIT_ARGS}
                -DLLVM_SOURCE_PREFIX=${LLVM_SOURCE_PREFIX}
                -DPACKAGE_VERSION=${PACKAGE_VERSION}
                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+               -DCMAKE_C_COMPILER_LAUNCHER=${CMAKE_C_COMPILER_LAUNCHER}
+               -DCMAKE_CXX_COMPILER_LAUNCHER=${CMAKE_CXX_COMPILER_LAUNCHER}
                -DCMAKE_EXPORT_COMPILE_COMMANDS=1
                ${cmake_args}
                ${PASSTHROUGH_VARIABLES}
