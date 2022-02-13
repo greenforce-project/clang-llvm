@@ -1,7 +1,7 @@
 # This file allows users to call find_package(Polly) and pick up our targets.
 
 find_package(LLVM REQUIRED CONFIG
-             HINTS "/drone/src/build/llvm/stage1/lib/cmake/llvm")
+             HINTS "/drone/src/build/llvm/stage2/lib/cmake/llvm")
 
 set(Polly_CMAKE_DIR ${CMAKE_CURRENT_LIST_DIR})
 set(Polly_BUNDLED_ISL ON)
