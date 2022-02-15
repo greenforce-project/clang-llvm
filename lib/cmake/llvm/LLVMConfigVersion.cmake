@@ -1,4 +1,4 @@
-set(PACKAGE_VERSION "15.0.0git")
+set(PACKAGE_VERSION "15.0.0")
 
 # LLVM is API-compatible only with matching major.minor versions
 # and patch versions not less than that requested.
