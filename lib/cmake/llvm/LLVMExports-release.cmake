@@ -824,6 +824,16 @@ set_target_properties(LLVMXRay PROPERTIES
 list(APPEND _IMPORT_CHECK_TARGETS LLVMXRay )
 list(APPEND _IMPORT_CHECK_FILES_FOR_LLVMXRay "${_IMPORT_PREFIX}/lib/libLLVMXRay.a" )
 
+# Import target "LLVMWindowsDriver" for configuration "Release"
+set_property(TARGET LLVMWindowsDriver APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(LLVMWindowsDriver PROPERTIES
+  IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/libLLVMWindowsDriver.a"
+  )
+
+list(APPEND _IMPORT_CHECK_TARGETS LLVMWindowsDriver )
+list(APPEND _IMPORT_CHECK_FILES_FOR_LLVMWindowsDriver "${_IMPORT_PREFIX}/lib/libLLVMWindowsDriver.a" )
+
 # Import target "LLVMWindowsManifest" for configuration "Release"
 set_property(TARGET LLVMWindowsManifest APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
 set_target_properties(LLVMWindowsManifest PROPERTIES
