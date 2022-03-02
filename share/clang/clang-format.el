@@ -147,7 +147,7 @@ uses the function `buffer-file-name'."
     (setq style clang-format-style))
 
   (unless assume-file-name
-    (setq assume-file-name (buffer-file-name (buffer-base-buffer))))
+    (setq assume-file-name buffer-file-name))
 
   (let ((file-start (clang-format--bufferpos-to-filepos start 'approximate
                                                         'utf-8-unix))

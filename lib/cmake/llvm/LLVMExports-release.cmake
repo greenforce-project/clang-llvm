@@ -404,16 +404,6 @@ set_target_properties(LLVMMCA PROPERTIES
 list(APPEND _IMPORT_CHECK_TARGETS LLVMMCA )
 list(APPEND _IMPORT_CHECK_FILES_FOR_LLVMMCA "${_IMPORT_PREFIX}/lib/libLLVMMCA.a" )
 
-# Import target "LLVMObjCopy" for configuration "Release"
-set_property(TARGET LLVMObjCopy APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
-set_target_properties(LLVMObjCopy PROPERTIES
-  IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
-  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/libLLVMObjCopy.a"
-  )
-
-list(APPEND _IMPORT_CHECK_TARGETS LLVMObjCopy )
-list(APPEND _IMPORT_CHECK_FILES_FOR_LLVMObjCopy "${_IMPORT_PREFIX}/lib/libLLVMObjCopy.a" )
-
 # Import target "LLVMObject" for configuration "Release"
 set_property(TARGET LLVMObject APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
 set_target_properties(LLVMObject PROPERTIES
@@ -833,16 +823,6 @@ set_target_properties(LLVMXRay PROPERTIES
 
 list(APPEND _IMPORT_CHECK_TARGETS LLVMXRay )
 list(APPEND _IMPORT_CHECK_FILES_FOR_LLVMXRay "${_IMPORT_PREFIX}/lib/libLLVMXRay.a" )
-
-# Import target "LLVMWindowsDriver" for configuration "Release"
-set_property(TARGET LLVMWindowsDriver APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
-set_target_properties(LLVMWindowsDriver PROPERTIES
-  IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
-  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/libLLVMWindowsDriver.a"
-  )
-
-list(APPEND _IMPORT_CHECK_TARGETS LLVMWindowsDriver )
-list(APPEND _IMPORT_CHECK_FILES_FOR_LLVMWindowsDriver "${_IMPORT_PREFIX}/lib/libLLVMWindowsDriver.a" )
 
 # Import target "LLVMWindowsManifest" for configuration "Release"
 set_property(TARGET LLVMWindowsManifest APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
@@ -1328,15 +1308,6 @@ set_target_properties(llvm-reduce PROPERTIES
 
 list(APPEND _IMPORT_CHECK_TARGETS llvm-reduce )
 list(APPEND _IMPORT_CHECK_FILES_FOR_llvm-reduce "${_IMPORT_PREFIX}/bin/llvm-reduce" )
-
-# Import target "llvm-remark-size-diff" for configuration "Release"
-set_property(TARGET llvm-remark-size-diff APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
-set_target_properties(llvm-remark-size-diff PROPERTIES
-  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/bin/llvm-remark-size-diff"
-  )
-
-list(APPEND _IMPORT_CHECK_TARGETS llvm-remark-size-diff )
-list(APPEND _IMPORT_CHECK_FILES_FOR_llvm-remark-size-diff "${_IMPORT_PREFIX}/bin/llvm-remark-size-diff" )
 
 # Import target "llvm-rtdyld" for configuration "Release"
 set_property(TARGET llvm-rtdyld APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
