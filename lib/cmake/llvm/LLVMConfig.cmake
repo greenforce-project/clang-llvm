@@ -132,7 +132,7 @@ set_property(GLOBAL PROPERTY LLVMBUILD_LIB_DEPS_LLVMExegesis )
 set_property(GLOBAL PROPERTY LLVMBUILD_LIB_DEPS_Remarks )
 set_property(GLOBAL PROPERTY LLVMBUILD_LIB_DEPS_Polly )
 
-set(TARGET_TRIPLE "x86_64-unknown-linux-gnu")
+set(LLVM_TARGET_TRIPLE "x86_64-unknown-linux-gnu")
 
 set(LLVM_HOST_TRIPLE "x86_64-unknown-linux-gnu")
 
