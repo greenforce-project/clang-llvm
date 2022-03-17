@@ -16,7 +16,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_targetsDefined)
 set(_targetsNotDefined)
 set(_expectedTargets)
-foreach(_expectedTarget clangBasic clangAPINotes clangLex clangParse clangAST clangDynamicASTMatchers clangASTMatchers clangCrossTU clangSema clangCodeGen clangAnalysis clangAnalysisFlowSensitive clangAnalysisFlowSensitiveModels clangEdit clangRewrite clangDriver clangSerialization clangRewriteFrontend clangFrontend clangFrontendTool clangToolingCore clangToolingInclusions clangToolingRefactoring clangToolingASTDiff clangToolingSyntax clangToolingSyntaxPseudo clangDependencyScanning clangTransformer clangTooling clangDirectoryWatcher clangIndex clangIndexSerialization clangStaticAnalyzerCore clangStaticAnalyzerCheckers clangStaticAnalyzerFrontend clangFormat clangTesting clangInterpreter diagtool clang clang-format clangHandleCXX clangHandleLLVM clang-offload-bundler clang-offload-wrapper clang-scan-deps clang-repl clang-pseudo clang-rename clang-refactor clang-cpp libclang)
+foreach(_expectedTarget clangBasic clangAPINotes clangLex clangParse clangAST clangDynamicASTMatchers clangASTMatchers clangCrossTU clangSema clangCodeGen clangAnalysis clangAnalysisFlowSensitive clangAnalysisFlowSensitiveModels clangEdit clangRewrite clangDriver clangSerialization clangRewriteFrontend clangFrontend clangFrontendTool clangToolingCore clangToolingInclusions clangToolingRefactoring clangToolingASTDiff clangToolingSyntax clangDependencyScanning clangTransformer clangTooling clangDirectoryWatcher clangIndex clangIndexSerialization clangStaticAnalyzerCore clangStaticAnalyzerCheckers clangStaticAnalyzerFrontend clangSymbolGraph clangFormat clangTesting clangInterpreter diagtool clang clang-format clangHandleCXX clangHandleLLVM clang-offload-bundler clang-offload-wrapper clang-scan-deps clang-repl clang-rename clang-refactor clang-cpp libclang)
   list(APPEND _expectedTargets ${_expectedTarget})
   if(NOT TARGET ${_expectedTarget})
     list(APPEND _targetsNotDefined ${_expectedTarget})
@@ -187,7 +187,7 @@ set_target_properties(clangFrontend PROPERTIES
 add_library(clangFrontendTool STATIC IMPORTED)
 
 set_target_properties(clangFrontendTool PROPERTIES
-  INTERFACE_LINK_LIBRARIES "clangBasic;clangCodeGen;clangDriver;clangFrontend;clangRewriteFrontend;LLVMOption;LLVMSupport"
+  INTERFACE_LINK_LIBRARIES "clangBasic;clangCodeGen;clangDriver;clangFrontend;clangRewriteFrontend;clangSymbolGraph;LLVMOption;LLVMSupport"
 )
 
 # Create imported target clangToolingCore
@@ -223,13 +223,6 @@ add_library(clangToolingSyntax STATIC IMPORTED)
 
 set_target_properties(clangToolingSyntax PROPERTIES
   INTERFACE_LINK_LIBRARIES "clangAST;clangBasic;clangFrontend;clangLex;clangToolingCore;LLVMSupport"
-)
-
-# Create imported target clangToolingSyntaxPseudo
-add_library(clangToolingSyntaxPseudo STATIC IMPORTED)
-
-set_target_properties(clangToolingSyntaxPseudo PROPERTIES
-  INTERFACE_LINK_LIBRARIES "clangBasic;clangLex;LLVMSupport"
 )
 
 # Create imported target clangDependencyScanning
@@ -295,6 +288,13 @@ set_target_properties(clangStaticAnalyzerFrontend PROPERTIES
   INTERFACE_LINK_LIBRARIES "clangAST;clangASTMatchers;clangAnalysis;clangBasic;clangCrossTU;clangFrontend;clangLex;clangStaticAnalyzerCheckers;clangStaticAnalyzerCore;LLVMSupport"
 )
 
+# Create imported target clangSymbolGraph
+add_library(clangSymbolGraph STATIC IMPORTED)
+
+set_target_properties(clangSymbolGraph PROPERTIES
+  INTERFACE_LINK_LIBRARIES "clangAST;clangBasic;clangFrontend;clangIndex;LLVMSupport"
+)
+
 # Create imported target clangFormat
 add_library(clangFormat STATIC IMPORTED)
 
@@ -350,9 +350,6 @@ add_executable(clang-scan-deps IMPORTED)
 
 # Create imported target clang-repl
 add_executable(clang-repl IMPORTED)
-
-# Create imported target clang-pseudo
-add_executable(clang-pseudo IMPORTED)
 
 # Create imported target clang-rename
 add_executable(clang-rename IMPORTED)
