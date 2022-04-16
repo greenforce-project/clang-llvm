@@ -3,6 +3,8 @@
   RunningOnValgrind;
   ValgrindSlowdown;
   WTFAnnotate*;
+  __b64_ntop;
+  __b64_pton;
   __bzero;
   __close;
   __cxa_atexit;
@@ -10,6 +12,8 @@
   __fxstat;
   __fxstat64;
   __getdelim;
+  __interceptor___b64_ntop;
+  __interceptor___b64_pton;
   __interceptor___bzero;
   __interceptor___close;
   __interceptor___cxa_atexit;

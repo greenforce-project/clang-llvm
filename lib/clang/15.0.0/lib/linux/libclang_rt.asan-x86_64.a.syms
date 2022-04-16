@@ -1,6 +1,8 @@
 {
   _Unwind_RaiseException;
   __asan_*;
+  __b64_ntop;
+  __b64_pton;
   __bzero;
   __cxa_atexit;
   __cxa_rethrow_primary_exception;
@@ -8,6 +10,8 @@
   __fprintf_chk;
   __getdelim;
   __interceptor__Unwind_RaiseException;
+  __interceptor___b64_ntop;
+  __interceptor___b64_pton;
   __interceptor___bzero;
   __interceptor___cxa_atexit;
   __interceptor___cxa_rethrow_primary_exception;
@@ -540,6 +544,7 @@
   __sanitizer_dump_coverage;
   __sanitizer_dump_trace_pc_guard_coverage;
   __sanitizer_finish_switch_fiber;
+  __sanitizer_free_hook;
   __sanitizer_get_allocated_size;
   __sanitizer_get_current_allocated_bytes;
   __sanitizer_get_estimated_allocated_size;
@@ -550,6 +555,7 @@
   __sanitizer_get_report_path;
   __sanitizer_get_unmapped_bytes;
   __sanitizer_install_malloc_and_free_hooks;
+  __sanitizer_malloc_hook;
   __sanitizer_on_print;
   __sanitizer_print_memory_profile;
   __sanitizer_print_stack_trace;
