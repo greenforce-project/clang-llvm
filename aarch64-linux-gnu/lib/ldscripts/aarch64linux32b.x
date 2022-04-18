@@ -7,7 +7,7 @@ OUTPUT_FORMAT("elf32-bigaarch64", "elf32-bigaarch64",
 	      "elf32-littleaarch64")
 OUTPUT_ARCH(aarch64:ilp32)
 ENTRY(_start)
-SEARCH_DIR("/drone/src/install/aarch64-linux-gnu/libilp32"); SEARCH_DIR("/drone/src/install/aarch64-linux-gnu/lib");
+SEARCH_DIR("/home/runner/work/tc_build/tc_build/install/aarch64-linux-gnu/libilp32"); SEARCH_DIR("/home/runner/work/tc_build/tc_build/install/aarch64-linux-gnu/lib");
 SECTIONS
 {
   /* Read-only sections, merged into text segment: */
