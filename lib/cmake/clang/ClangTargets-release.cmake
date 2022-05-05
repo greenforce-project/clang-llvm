@@ -365,16 +365,6 @@ set_target_properties(clangFormat PROPERTIES
 list(APPEND _IMPORT_CHECK_TARGETS clangFormat )
 list(APPEND _IMPORT_CHECK_FILES_FOR_clangFormat "${_IMPORT_PREFIX}/lib/libclangFormat.a" )
 
-# Import target "clangTesting" for configuration "Release"
-set_property(TARGET clangTesting APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
-set_target_properties(clangTesting PROPERTIES
-  IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
-  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/libclangTesting.a"
-  )
-
-list(APPEND _IMPORT_CHECK_TARGETS clangTesting )
-list(APPEND _IMPORT_CHECK_FILES_FOR_clangTesting "${_IMPORT_PREFIX}/lib/libclangTesting.a" )
-
 # Import target "clangInterpreter" for configuration "Release"
 set_property(TARGET clangInterpreter APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
 set_target_properties(clangInterpreter PROPERTIES
@@ -384,6 +374,16 @@ set_target_properties(clangInterpreter PROPERTIES
 
 list(APPEND _IMPORT_CHECK_TARGETS clangInterpreter )
 list(APPEND _IMPORT_CHECK_FILES_FOR_clangInterpreter "${_IMPORT_PREFIX}/lib/libclangInterpreter.a" )
+
+# Import target "clangSupport" for configuration "Release"
+set_property(TARGET clangSupport APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(clangSupport PROPERTIES
+  IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/libclangSupport.a"
+  )
+
+list(APPEND _IMPORT_CHECK_TARGETS clangSupport )
+list(APPEND _IMPORT_CHECK_FILES_FOR_clangSupport "${_IMPORT_PREFIX}/lib/libclangSupport.a" )
 
 # Import target "diagtool" for configuration "Release"
 set_property(TARGET diagtool APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
