@@ -64,6 +64,16 @@ set_target_properties(LLVMCore PROPERTIES
 list(APPEND _IMPORT_CHECK_TARGETS LLVMCore )
 list(APPEND _IMPORT_CHECK_FILES_FOR_LLVMCore "${_IMPORT_PREFIX}/lib/libLLVMCore.a" )
 
+# Import target "LLVMFuzzerCLI" for configuration "Release"
+set_property(TARGET LLVMFuzzerCLI APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(LLVMFuzzerCLI PROPERTIES
+  IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/libLLVMFuzzerCLI.a"
+  )
+
+list(APPEND _IMPORT_CHECK_TARGETS LLVMFuzzerCLI )
+list(APPEND _IMPORT_CHECK_FILES_FOR_LLVMFuzzerCLI "${_IMPORT_PREFIX}/lib/libLLVMFuzzerCLI.a" )
+
 # Import target "LLVMFuzzMutate" for configuration "Release"
 set_property(TARGET LLVMFuzzMutate APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
 set_target_properties(LLVMFuzzMutate PROPERTIES
