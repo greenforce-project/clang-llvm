@@ -221,7 +221,7 @@ set_target_properties(LLVMTransformUtils PROPERTIES
 add_library(LLVMInstrumentation STATIC IMPORTED)
 
 set_target_properties(LLVMInstrumentation PROPERTIES
-  INTERFACE_LINK_LIBRARIES "LLVMAnalysis;LLVMCore;LLVMMC;LLVMSupport;LLVMTransformUtils;LLVMProfileData"
+  INTERFACE_LINK_LIBRARIES "LLVMAnalysis;LLVMCore;LLVMDemangle;LLVMMC;LLVMSupport;LLVMTransformUtils;LLVMProfileData"
 )
 
 # Create imported target LLVMAggressiveInstCombine
