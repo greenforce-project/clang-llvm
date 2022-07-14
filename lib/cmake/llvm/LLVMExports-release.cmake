@@ -1057,6 +1057,15 @@ set_target_properties(llvm-cxxmap PROPERTIES
 list(APPEND _IMPORT_CHECK_TARGETS llvm-cxxmap )
 list(APPEND _IMPORT_CHECK_FILES_FOR_llvm-cxxmap "${_IMPORT_PREFIX}/bin/llvm-cxxmap" )
 
+# Import target "llvm-debuginfod" for configuration "Release"
+set_property(TARGET llvm-debuginfod APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(llvm-debuginfod PROPERTIES
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/bin/llvm-debuginfod"
+  )
+
+list(APPEND _IMPORT_CHECK_TARGETS llvm-debuginfod )
+list(APPEND _IMPORT_CHECK_FILES_FOR_llvm-debuginfod "${_IMPORT_PREFIX}/bin/llvm-debuginfod" )
+
 # Import target "llvm-debuginfod-find" for configuration "Release"
 set_property(TARGET llvm-debuginfod-find APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
 set_target_properties(llvm-debuginfod-find PROPERTIES
