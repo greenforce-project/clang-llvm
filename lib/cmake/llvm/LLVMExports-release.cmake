@@ -1112,6 +1112,15 @@ set_target_properties(llvm-dwarfdump PROPERTIES
 list(APPEND _IMPORT_CHECK_TARGETS llvm-dwarfdump )
 list(APPEND _IMPORT_CHECK_FILES_FOR_llvm-dwarfdump "${_IMPORT_PREFIX}/bin/llvm-dwarfdump" )
 
+# Import target "llvm-dwarfutil" for configuration "Release"
+set_property(TARGET llvm-dwarfutil APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(llvm-dwarfutil PROPERTIES
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/bin/llvm-dwarfutil"
+  )
+
+list(APPEND _IMPORT_CHECK_TARGETS llvm-dwarfutil )
+list(APPEND _IMPORT_CHECK_FILES_FOR_llvm-dwarfutil "${_IMPORT_PREFIX}/bin/llvm-dwarfutil" )
+
 # Import target "llvm-dwp" for configuration "Release"
 set_property(TARGET llvm-dwp APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
 set_target_properties(llvm-dwp PROPERTIES

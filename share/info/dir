@@ -24,10 +24,8 @@ Individual utilities
 * cxxfilt: (binutils)c++filt.                   MS-DOS name for c++filt.
 * dlltool: (binutils)dlltool.                   Create files needed to build 
                                                   and use DLLs.
-* elfedit: (binutils)elfedit.                   Update the ELF header of ELF 
-                                                  files.
-* nlmconv: (binutils)nlmconv.                   Converts object code into an 
-                                                  NLM.
+* elfedit: (binutils)elfedit.                   Update ELF header and property 
+                                                  of ELF files.
 * nm: (binutils)nm.                             List symbols from object files.
 * objcopy: (binutils)objcopy.                   Copy and translate object 
                                                   files.
