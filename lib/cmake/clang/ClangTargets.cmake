@@ -110,7 +110,7 @@ set_target_properties(clangCrossTU PROPERTIES
 add_library(clangSema STATIC IMPORTED)
 
 set_target_properties(clangSema PROPERTIES
-  INTERFACE_LINK_LIBRARIES "clangAST;clangAnalysis;clangBasic;clangEdit;clangLex;LLVMCore;LLVMFrontendOpenMP;LLVMMC;LLVMSupport"
+  INTERFACE_LINK_LIBRARIES "clangAST;clangAnalysis;clangBasic;clangEdit;clangLex;clangSupport;LLVMCore;LLVMFrontendOpenMP;LLVMMC;LLVMSupport"
 )
 
 # Create imported target clangCodeGen
@@ -166,7 +166,7 @@ set_target_properties(clangRewrite PROPERTIES
 add_library(clangDriver STATIC IMPORTED)
 
 set_target_properties(clangDriver PROPERTIES
-  INTERFACE_LINK_LIBRARIES "clangBasic;LLVMBinaryFormat;LLVMMC;LLVMOption;LLVMProfileData;LLVMSupport;LLVMWindowsDriver"
+  INTERFACE_LINK_LIBRARIES "clangBasic;LLVMBinaryFormat;LLVMMC;LLVMObject;LLVMOption;LLVMProfileData;LLVMSupport;LLVMWindowsDriver"
 )
 
 # Create imported target clangSerialization

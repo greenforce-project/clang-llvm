@@ -438,7 +438,7 @@ set_target_properties(LLVMInterpreter PROPERTIES
 add_library(LLVMJITLink STATIC IMPORTED)
 
 set_target_properties(LLVMJITLink PROPERTIES
-  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:LLVMObject>;\$<LINK_ONLY:LLVMOrcShared>;\$<LINK_ONLY:LLVMOrcTargetProcess>;\$<LINK_ONLY:LLVMSupport>;LLVMBinaryFormat;LLVMObject;LLVMOrcTargetProcess;LLVMSupport"
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:LLVMObject>;\$<LINK_ONLY:LLVMOrcShared>;\$<LINK_ONLY:LLVMOrcTargetProcess>;\$<LINK_ONLY:LLVMSupport>;LLVMBinaryFormat;LLVMObject;LLVMOption;LLVMOrcTargetProcess;LLVMSupport"
 )
 
 # Create imported target LLVMMCJIT
