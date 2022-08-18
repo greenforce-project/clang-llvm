@@ -7,6 +7,7 @@
   __cxa_atexit;
   __cxa_rethrow_primary_exception;
   __cxa_throw;
+  __dn_comp;
   __dn_expand;
   __fprintf_chk;
   __getdelim;
@@ -17,6 +18,7 @@
   __interceptor___cxa_atexit;
   __interceptor___cxa_rethrow_primary_exception;
   __interceptor___cxa_throw;
+  __interceptor___dn_comp;
   __interceptor___dn_expand;
   __interceptor___fprintf_chk;
   __interceptor___getdelim;

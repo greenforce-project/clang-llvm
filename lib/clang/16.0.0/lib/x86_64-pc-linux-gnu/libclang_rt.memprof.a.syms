@@ -2,12 +2,14 @@
   __b64_ntop;
   __b64_pton;
   __bzero;
+  __dn_comp;
   __dn_expand;
   __fprintf_chk;
   __getdelim;
   __interceptor___b64_ntop;
   __interceptor___b64_pton;
   __interceptor___bzero;
+  __interceptor___dn_comp;
   __interceptor___dn_expand;
   __interceptor___fprintf_chk;
   __interceptor___getdelim;

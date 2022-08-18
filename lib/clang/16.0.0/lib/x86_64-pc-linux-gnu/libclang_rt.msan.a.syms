@@ -3,6 +3,7 @@
   __b64_pton;
   __bzero;
   __cxa_atexit;
+  __dn_comp;
   __dn_expand;
   __fprintf_chk;
   __fxstat;
@@ -15,6 +16,7 @@
   __interceptor___b64_pton;
   __interceptor___bzero;
   __interceptor___cxa_atexit;
+  __interceptor___dn_comp;
   __interceptor___dn_expand;
   __interceptor___fprintf_chk;
   __interceptor___fxstat;

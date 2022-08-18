@@ -921,15 +921,6 @@ set_target_properties(llvm-profdata PROPERTIES
 list(APPEND _cmake_import_check_targets llvm-profdata )
 list(APPEND _cmake_import_check_files_for_llvm-profdata "${_IMPORT_PREFIX}/bin/llvm-profdata" )
 
-# Import target "clang-tblgen" for configuration "Release"
-set_property(TARGET clang-tblgen APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
-set_target_properties(clang-tblgen PROPERTIES
-  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/bin/clang-tblgen"
-  )
-
-list(APPEND _cmake_import_check_targets clang-tblgen )
-list(APPEND _cmake_import_check_files_for_clang-tblgen "${_IMPORT_PREFIX}/bin/clang-tblgen" )
-
 # Import target "bugpoint" for configuration "Release"
 set_property(TARGET bugpoint APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
 set_target_properties(bugpoint PROPERTIES
