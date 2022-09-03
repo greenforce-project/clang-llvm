@@ -171,7 +171,6 @@ endif()
 
 set(LLVM_ENABLE_ZSTD 1)
 if(LLVM_ENABLE_ZSTD)
-  set(zstd_ROOT )
   find_package(zstd)
 endif()
 

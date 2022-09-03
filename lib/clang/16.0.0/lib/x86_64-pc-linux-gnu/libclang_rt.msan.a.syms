@@ -662,6 +662,8 @@
   __sanitizer_cov_trace_pc_indir;
   __sanitizer_cov_trace_switch;
   __sanitizer_dtor_callback;
+  __sanitizer_dtor_callback_fields;
+  __sanitizer_dtor_callback_vptr;
   __sanitizer_dump_coverage;
   __sanitizer_dump_trace_pc_guard_coverage;
   __sanitizer_free_hook;
