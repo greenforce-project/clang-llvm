@@ -345,7 +345,7 @@ set_target_properties(LLVMObjCopy PROPERTIES
 add_library(LLVMObject STATIC IMPORTED)
 
 set_target_properties(LLVMObject PROPERTIES
-  INTERFACE_LINK_LIBRARIES "LLVMBitReader;LLVMCore;LLVMMC;LLVMBinaryFormat;LLVMMCParser;LLVMSupport;LLVMTextAPI"
+  INTERFACE_LINK_LIBRARIES "LLVMBitReader;LLVMCore;LLVMMC;LLVMIRReader;LLVMBinaryFormat;LLVMMCParser;LLVMSupport;LLVMTextAPI"
 )
 
 # Create imported target LLVMObjectYAML
