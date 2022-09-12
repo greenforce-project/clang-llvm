@@ -45,9 +45,6 @@ Individual utilities
 * windres: (binutils)windres.                   Manipulate Windows resources.
 
 Software development
-* As: (as).                     The GNU assembler.
 * Bfd: (bfd).                   The Binary File Descriptor library.
 * Binutils: (binutils).         The GNU binary utilities.
-* Gas: (as).                    The GNU assembler.
 * Ld: (ld).                     The GNU linker.
-* gprof: (gprof).               Profiling your program's execution
