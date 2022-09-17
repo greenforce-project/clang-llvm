@@ -1366,6 +1366,15 @@ set_target_properties(llvm-remark-size-diff PROPERTIES
 list(APPEND _cmake_import_check_targets llvm-remark-size-diff )
 list(APPEND _cmake_import_check_files_for_llvm-remark-size-diff "${_IMPORT_PREFIX}/bin/llvm-remark-size-diff" )
 
+# Import target "llvm-remarkutil" for configuration "Release"
+set_property(TARGET llvm-remarkutil APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(llvm-remarkutil PROPERTIES
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/bin/llvm-remarkutil"
+  )
+
+list(APPEND _cmake_import_check_targets llvm-remarkutil )
+list(APPEND _cmake_import_check_files_for_llvm-remarkutil "${_IMPORT_PREFIX}/bin/llvm-remarkutil" )
+
 # Import target "llvm-rtdyld" for configuration "Release"
 set_property(TARGET llvm-rtdyld APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
 set_target_properties(llvm-rtdyld PROPERTIES
