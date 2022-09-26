@@ -2,7 +2,7 @@
 
 ## Host compatibility
 
-This toolchain is built on Ubuntu 20.04 , which uses glibc 2.31. Compatibility with older distributions cannot be guaranteed. Other libc implementations (such as musl) are not supported.
+This toolchain is built on Ubuntu 20.04, which uses glibc 2.31. Compatibility with older distributions cannot be guaranteed. Other libc implementations (such as musl) are not supported.
 
 ## Building Linux
 
@@ -36,6 +36,10 @@ Android kernels 4.19 and newer use the upstream variable `CROSS_COMPILE_COMPAT`.
 
 Greenforce Clang has been designed to be easy-to-use compared to other toolchains, such as [AOSP Clang](https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/). The differences are as follows:
 
-- `CLANG_TRIPLE` does not need to be set because we don't use AOSP binutils
-- `LD_LIBRARY_PATH` does not need to be set because we set library load paths in the toolchain
-- No separate GCC/binutils toolchains are necessary; all tools are bundled
+- `CLANG_TRIPLE` does not need to be set because we don't use AOSP binutils.
+- `LD_LIBRARY_PATH` does not need to be set because we set library load paths in the toolchain.
+- No separate GCC/binutils toolchains are necessary; all tools are bundled.
+
+#### Additional patches
+
+To use full Clang LTO with Greenforce Clang, you have to cherry-pick [ANDROID: generate_initcall_order.pl: Use two dash long options for llvm-nm](https://android.googlesource.com/kernel/common.git/+/240f2f8f42f57b46788379e0072836cb2cb40c8c) otherwise your kernel will not boot.
