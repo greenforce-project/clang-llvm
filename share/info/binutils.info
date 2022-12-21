@@ -1,7 +1,7 @@
-This is binutils.info, produced by makeinfo version 6.7 from
+This is binutils.info, produced by makeinfo version 6.8 from
 binutils.texi.
 
-Copyright (C) 1991-2022 Free Software Foundation, Inc.
+Copyright (C) 1991-2020 Free Software Foundation, Inc.
 
    Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -42,7 +42,7 @@ Introduction
 ************
 
 This brief manual contains documentation for the GNU binary utilities
-(GNU Binutils) version 2.38:
+(GNU Binutils) version 2.34:
 
    This document is distributed under the terms of the GNU Free
 Documentation License version 1.3.  A copy of the license is included in
@@ -79,7 +79,7 @@ File: binutils.info,  Node: ar,  Next: nm,  Prev: Top,  Up: Top
 1 ar
 ****
 
-     ar [-]P[MOD] [--plugin NAME] [--target BFDNAME] [--output DIRNAME] [--record-libdeps LIBDEPS] [RELPOS] [COUNT] ARCHIVE [MEMBER...]
+     ar [-]P[MOD] [--plugin NAME] [--target BFDNAME] [--output DIRNAME] [RELPOS] [COUNT] ARCHIVE [MEMBER...]
      ar -M [ <mri-script ]
 
    The GNU 'ar' program creates, modifies, and extracts from archives.
@@ -100,9 +100,6 @@ characters (typical of formats related to coff).
 
    'ar' is considered a binary utility because archives of this sort are
 most often used as "libraries" holding commonly needed subroutines.
-Since libraries often will depend on other libraries, 'ar' can also
-record the dependencies of a library when the '--record-libdeps' option
-is specified.
 
    'ar' creates an index to the symbols defined in relocatable object
 modules in the archive when you specify the modifier 's'.  Once created,
@@ -153,7 +150,7 @@ File: binutils.info,  Node: ar cmdline,  Next: ar scripts,  Up: ar
 1.1 Controlling 'ar' on the Command Line
 ========================================
 
-     ar [-X32_64] [-]P[MOD] [--plugin NAME] [--target BFDNAME] [--output DIRNAME] [--record-libdeps LIBDEPS] [--thin] [RELPOS] [COUNT] ARCHIVE [MEMBER...]
+     ar [-X32_64] [-]P[MOD] [--plugin NAME] [--target BFDNAME] [--output DIRNAME] [RELPOS] [COUNT] ARCHIVE [MEMBER...]
 
    When you use 'ar' in the Unix style, 'ar' insists on at least two
 arguments to execute: one keyletter specifying the _operation_
@@ -322,12 +319,7 @@ to specify variations on an operation's behavior:
      specification.  (same as 'b').
 
 'l'
-     Specify dependencies of this library.  The dependencies must
-     immediately follow this option character, must use the same syntax
-     as the linker command line, and must be specified within a single
-     argument.  I.e., if multiple items are needed, they must be quoted
-     to form a single command line argument.  For example 'L
-     "-L/usr/local/lib -lmydep1 -lmydep2"'
+     This modifier is accepted but not used.
 
 'N'
      Uses the COUNT parameter.  This is used if there are multiple
@@ -371,9 +363,9 @@ to specify variations on an operation's behavior:
      you must run 'ranlib' on the archive.
 
 'T'
-     Deprecated alias for '--thin'.  'T' is not recommended because in
-     many ar implementations 'T' has a different meaning, as specified
-     by X/Open System Interface.
+     Make the specified ARCHIVE a _thin_ archive.  If it already exists
+     and is a regular archive, the existing members must be present in
+     the same directory as ARCHIVE.
 
 'u'
      Normally, 'ar r'... inserts all files listed into the archive.  If
@@ -455,15 +447,6 @@ specific ways:
      Note - although the presence of this option does imply a 'x'
      extraction operation that option must still be included on the
      command line.
-
-'--record-libdeps LIBDEPS'
-     The '--record-libdeps' option is identical to the 'l' modifier,
-     just handled in long form.
-
-'--thin'
-     Make the specified ARCHIVE a _thin_ archive.  If it already exists
-     and is a regular archive, the existing members must be present in
-     the same directory as ARCHIVE.
 
 
 File: binutils.info,  Node: ar scripts,  Prev: ar cmdline,  Up: ar
@@ -613,38 +596,21 @@ File: binutils.info,  Node: nm,  Next: objcopy,  Prev: ar,  Up: Top
 2 nm
 ****
 
-     nm [-A|-o|--print-file-name]
-        [-a|--debug-syms]
-        [-B|--format=bsd]
-        [-C|--demangle[=STYLE]]
-        [-D|--dynamic]
-        [-fFORMAT|--format=FORMAT]
-        [-g|--extern-only]
-        [-h|--help]
-        [--ifunc-chars=CHARS]
-        [-j|--format=just-symbols]
+     nm [-A|-o|--print-file-name] [-a|--debug-syms]
+        [-B|--format=bsd] [-C|--demangle[=STYLE]]
+        [-D|--dynamic] [-fFORMAT|--format=FORMAT]
+        [-g|--extern-only] [-h|--help]
         [-l|--line-numbers] [--inlines]
         [-n|-v|--numeric-sort]
-        [-P|--portability]
-        [-p|--no-sort]
-        [-r|--reverse-sort]
-        [-S|--print-size]
-        [-s|--print-armap]
-        [-t RADIX|--radix=RADIX]
-        [-u|--undefined-only]
-        [-U METHOD] [--unicode=METHOD]
-        [-V|--version]
-        [-X 32_64]
-        [--defined-only]
-        [--no-demangle]
-        [--no-recurse-limit|--recurse-limit]]
+        [-P|--portability] [-p|--no-sort]
+        [-r|--reverse-sort] [-S|--print-size]
+        [-s|--print-armap] [-t RADIX|--radix=RADIX]
+        [-u|--undefined-only] [-V|--version]
+        [-X 32_64] [--defined-only] [--no-demangle]
         [--plugin NAME]
-        [--size-sort]
-        [--special-syms]
-        [--synthetic]
-        [--target=BFDNAME]
-        [--with-symbol-versions]
-        [--without-symbol-versions]
+        [--no-recurse-limit|--recurse-limit]]
+        [--size-sort] [--special-syms]
+        [--synthetic] [--with-symbol-versions] [--target=BFDNAME]
         [OBJFILE...]
 
    GNU 'nm' lists the symbols from object files OBJFILE....  If no
@@ -672,15 +638,12 @@ object files are listed as arguments, 'nm' assumes the file 'a.out'.
           exact behavior is system dependent.
 
      'C'
-     'c'
           The symbol is common.  Common symbols are uninitialized data.
           When linking, multiple common symbols may appear with the same
           name.  If the symbol is defined anywhere, the common symbols
           are treated as undefined references.  For more details on
           common symbols, see the discussion of -warn-common in *note
-          Linker options: (ld.info)Options.  The lower case C character
-          is used when the symbol is in a special section for small
-          commons.
+          Linker options: (ld.info)Options.
 
      'D'
      'd'
@@ -695,21 +658,13 @@ object files are listed as arguments, 'nm' assumes the file 'a.out'.
 
      'i'
           For PE format files this indicates that the symbol is in a
-          section specific to the implementation of DLLs.
-
-          For ELF format files this indicates that the symbol is an
-          indirect function.  This is a GNU extension to the standard
-          set of ELF symbol types.  It indicates a symbol which if
-          referenced by a relocation does not evaluate to its address,
-          but instead must be invoked at runtime.  The runtime execution
-          will then return the value to be used in the relocation.
-
-          Note - the actual symbols display for GNU indirect symbols is
-          controlled by the '--ifunc-chars' command line option.  If
-          this option has been provided then the first character in the
-          string will be used for global indirect function symbols.  If
-          the string contains a second character then that will be used
-          for local indirect function symbols.
+          section specific to the implementation of DLLs.  For ELF
+          format files this indicates that the symbol is an indirect
+          function.  This is a GNU extension to the standard set of ELF
+          symbol types.  It indicates a symbol which if referenced by a
+          relocation does not evaluate to its address, but instead must
+          be invoked at runtime.  The runtime execution will then return
+          the value to be used in the relocation.
 
      'I'
           The symbol is an indirect reference to another symbol.
@@ -774,14 +729,7 @@ object files are listed as arguments, 'nm' assumes the file 'a.out'.
      '?'
           The symbol type is unknown, or object file format specific.
 
-   * The symbol name.  If a symbol has version information associated
-     with it, then the version information is displayed as well.  If the
-     versioned symbol is undefined or hidden from linker, the version
-     string is displayed as a suffix to the symbol name, preceded by an
-     @ character.  For example 'foo@VER_1'.  If the version is the
-     default version to be used when resolving unversioned references to
-     the symbol, then it is displayed as a suffix preceded by two @
-     characters.  For example 'foo@@VER_2'.
+   * The symbol name.
 
    The long and short forms of options, shown here as alternatives, are
 equivalent.
@@ -819,11 +767,11 @@ equivalent.
 '--no-recursion-limit'
      Enables or disables a limit on the amount of recursion performed
      whilst demangling strings.  Since the name mangling formats allow
-     for an infinite level of recursion it is possible to create strings
-     whose decoding will exhaust the amount of stack space available on
-     the host machine, triggering a memory fault.  The limit tries to
-     prevent this from happening by restricting recursion to 2048 levels
-     of nesting.
+     for an inifinite level of recursion it is possible to create
+     strings whose decoding will exhaust the amount of stack space
+     available on the host machine, triggering a memory fault.  The
+     limit tries to prevent this from happening by restricting recursion
+     to 2048 levels of nesting.
 
      The default is for this limit to be enabled, but disabling it may
      be necessary in order to demangle truly complicated names.  Note
@@ -839,9 +787,9 @@ equivalent.
 
 '-f FORMAT'
 '--format=FORMAT'
-     Use the output format FORMAT, which can be 'bsd', 'sysv', 'posix'
-     or 'just-symbols'.  The default is 'bsd'.  Only the first character
-     of FORMAT is significant; it can be either upper or lower case.
+     Use the output format FORMAT, which can be 'bsd', 'sysv', or
+     'posix'.  The default is 'bsd'.  Only the first character of FORMAT
+     is significant; it can be either upper or lower case.
 
 '-g'
 '--extern-only'
@@ -850,18 +798,6 @@ equivalent.
 '-h'
 '--help'
      Show a summary of the options to 'nm' and exit.
-
-'--ifunc-chars=CHARS'
-     When display GNU indirect function symbols 'nm' will default to
-     using the 'i' character for both local indirect functions and
-     global indirect functions.  The '--ifunc-chars' option allows the
-     user to specify a string containing one or two characters.  The
-     first character will be used for global indirect function symbols
-     and the second character, if present, will be used for local
-     indirect function symbols.
-
-'j'
-     The same as '--format=just-symbols'.
 
 '-l'
 '--line-numbers'
@@ -924,22 +860,6 @@ equivalent.
      Display only undefined symbols (those external to each object
      file).
 
-'-U [D|I|L|E|X|H]'
-'--unicode=[DEFAULT|INVALID|LOCALE|ESCAPE|HEX|HIGHLIGHT]'
-     Controls the display of UTF-8 encoded multibyte characters in
-     strings.  The default ('--unicode=default') is to give them no
-     special treatment.  The '--unicode=locale' option displays the
-     sequence in the current locale, which may or may not support them.
-     The options '--unicode=hex' and '--unicode=invalid' display them as
-     hex byte sequences enclosed by either angle brackets or curly
-     braces.
-
-     The '--unicode=escape' option displays them as escape sequences
-     (\UXXXX) and the '--unicode=highlight' option displays them as
-     escape sequences highlighted in red (if supported by the output
-     device).  The colouring is intended to draw attention to the
-     presence of unicode sequences where they might not be expected.
-
 '-V'
 '--version'
      Show the version number of 'nm' and exit.
@@ -995,14 +915,12 @@ equivalent.
      code.
 
 '--with-symbol-versions'
-'--without-symbol-versions'
-     Enables or disables the display of symbol version information.  The
-     version string is displayed as a suffix to the symbol name,
-     preceded by an @ character.  For example 'foo@VER_1'.  If the
+     Enables the display of symbol version information if any exists.
+     The version string is displayed as a suffix to the symbol name,
+     preceeded by an @ character.  For example 'foo@VER_1'.  If the
      version is the default version to be used when resolving
      unversioned references to the symbol then it is displayed as a
-     suffix preceded by two @ characters.  For example 'foo@@VER_2'.  By
-     default, symbol version information is displayed.
+     suffix preceeded by two @ characters.  For example 'foo@@VER_2'.
 
 '--target=BFDNAME'
      Specify an object code format other than your system's default
@@ -1022,8 +940,6 @@ File: binutils.info,  Node: objcopy,  Next: objdump,  Prev: nm,  Up: Top
              [-g|--strip-debug]
              [--strip-unneeded]
              [-K SYMBOLNAME|--keep-symbol=SYMBOLNAME]
-             [--keep-file-symbols]
-             [--keep-section-symbols]
              [-N SYMBOLNAME|--strip-symbol=SYMBOLNAME]
              [--strip-unneeded-symbol=SYMBOLNAME]
              [-G SYMBOLNAME|--keep-global-symbol=SYMBOLNAME]
@@ -1080,6 +996,7 @@ File: binutils.info,  Node: objcopy,  Next: objdump,  Prev: nm,  Up: Top
              [--prefix-sections=STRING]
              [--prefix-alloc-sections=STRING]
              [--add-gnu-debuglink=PATH-TO-FILE]
+             [--keep-file-symbols]
              [--only-keep-debug]
              [--strip-dwo]
              [--extract-dwo]
@@ -1190,7 +1107,7 @@ the '--reverse-bytes' option.)
 
             --only-section=.text.* --only-section=!.text.foo
 
-     will copy all sectinos matching '.text.*' but not the section
+     will copy all sectinos maching '.text.*' but not the section
      '.text.foo'.
 
 '-R SECTIONPATTERN'
@@ -1244,16 +1161,13 @@ the '--reverse-bytes' option.)
 '-S'
 '--strip-all'
      Do not copy relocation and symbol information from the source file.
-     Also deletes debug sections.
 
 '-g'
 '--strip-debug'
      Do not copy debugging symbols or sections from the source file.
 
 '--strip-unneeded'
-     Remove all symbols that are not needed for relocation processing in
-     addition to debugging symbols and sections stripped by
-     '--strip-debug'.
+     Strip all symbols that are not needed for relocation processing.
 
 '-K SYMBOLNAME'
 '--keep-symbol=SYMBOLNAME'
@@ -1402,15 +1316,13 @@ the '--reverse-bytes' option.)
      filled in with the value specified by '--gap-fill' (default zero).
 
 '--set-start VAL'
-     Set the start address (also known as the entry address) of the new
-     file to VAL.  Not all object file formats support setting the start
-     address.
+     Set the start address of the new file to VAL.  Not all object file
+     formats support setting the start address.
 
 '--change-start INCR'
 '--adjust-start INCR'
-     Change the start address (also known as the entry address) by
-     adding INCR.  Not all object file formats support setting the start
-     address.
+     Change the start address by adding INCR.  Not all object file
+     formats support setting the start address.
 
 '--change-addresses INCR'
 '--adjust-vma INCR'
@@ -1474,13 +1386,11 @@ the '--reverse-bytes' option.)
      Set the flags for any sections matching SECTIONPATTERN.  The FLAGS
      argument is a comma separated string of flag names.  The recognized
      names are 'alloc', 'contents', 'load', 'noload', 'readonly',
-     'code', 'data', 'rom', 'exclude', 'share', and 'debug'.  You can
-     set the 'contents' flag for a section which does not have contents,
-     but it is not meaningful to clear the 'contents' flag of a section
-     which does have contents-just remove the section instead.  Not all
-     flags are meaningful for all object file formats.  In particular
-     the 'share' flag is only meaningful for COFF format files and not
-     for ELF format files.
+     'code', 'data', 'rom', 'share', and 'debug'.  You can set the
+     'contents' flag for a section which does not have contents, but it
+     is not meaningful to clear the 'contents' flag of a section which
+     does have contents-just remove the section instead.  Not all flags
+     are meaningful for all object file formats.
 
 '--set-section-alignment SECTIONPATTERN=ALIGN'
      Set the alignment for any sections matching SECTIONPATTERN.  ALIGN
@@ -1537,8 +1447,6 @@ the '--reverse-bytes' option.)
      section's flags to FLAGS in the process.  This has the advantage
      over using a linker script to perform the rename in that the output
      stays as an object file and does not become a linked executable.
-     This option accepts the same set of flags as the
-     '--sect-section-flags' option.
 
      This option is particularly helpful when the input format is
      binary, since this will always create a section called .data.  If
@@ -1748,11 +1656,6 @@ the '--reverse-bytes' option.)
      locations before the debugger is run everything should work
      correctly.
 
-'--keep-section-symbils'
-     When stripping a file, perhaps with '--strip-debug' or
-     '--strip-unneeded', retain any symbols specifying section names,
-     which would otherwise get stripped.
-
 '--keep-file-symbols'
      When stripping a file, perhaps with '--strip-debug' or
      '--strip-unneeded', retain any symbols specifying source file
@@ -1959,11 +1862,8 @@ File: binutils.info,  Node: objdump,  Next: ranlib,  Prev: objcopy,  Up: Top
              [-r|--reloc]
              [-R|--dynamic-reloc]
              [-s|--full-contents]
-             [-W[lLiaprmfFsoORtUuTgAck]|
-              --dwarf[=rawline,=decodedline,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames-interp,=str,=str-offsets,=loc,=Ranges,=pubtypes,=trace_info,=trace_abbrev,=trace_aranges,=gdb_index,=addr,=cu_index,=links]]
-             [-WK|--dwarf=follow-links]
-             [-WN|--dwarf=no-follow-links]
-             [-L|--process-links]
+             [-W[lLiaprmfFsoRtUuTgAckK]|
+              --dwarf[=rawline,=decodedline,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames-interp,=str,=loc,=Ranges,=pubtypes,=trace_info,=trace_abbrev,=trace_aranges,=gdb_index,=addr,=cu_index,=links,=follow-links]]
              [--ctf=SECTION]
              [-G|--stabs]
              [-t|--syms]
@@ -1972,7 +1872,6 @@ File: binutils.info,  Node: objdump,  Next: ranlib,  Prev: objcopy,  Up: Top
              [-w|--wide]
              [--start-address=ADDRESS]
              [--stop-address=ADDRESS]
-             [--no-addresses]
              [--prefix-addresses]
              [--[no-]show-raw-insn]
              [--adjust-vma=OFFSET]
@@ -1985,7 +1884,6 @@ File: binutils.info,  Node: objdump,  Next: ranlib,  Prev: objcopy,  Up: Top
              [--prefix-strip=LEVEL]
              [--insn-width=WIDTH]
              [--visualize-jumps[=color|=extended-color|=off]
-             [-U METHOD] [--unicode=METHOD]
              [-V|--version]
              [-H|--help]
              OBJFILE...
@@ -2048,11 +1946,11 @@ given.
 '--no-recursion-limit'
      Enables or disables a limit on the amount of recursion performed
      whilst demangling strings.  Since the name mangling formats allow
-     for an infinite level of recursion it is possible to create strings
-     whose decoding will exhaust the amount of stack space available on
-     the host machine, triggering a memory fault.  The limit tries to
-     prevent this from happening by restricting recursion to 2048 levels
-     of nesting.
+     for an inifinite level of recursion it is possible to create
+     strings whose decoding will exhaust the amount of stack space
+     available on the host machine, triggering a memory fault.  The
+     limit tries to prevent this from happening by restricting recursion
+     to 2048 levels of nesting.
 
      The default is for this limit to be enabled, but disabling it may
      be necessary in order to demangle truly complicated names.  Note
@@ -2064,7 +1962,7 @@ given.
 '--debugging'
      Display debugging information.  This attempts to parse STABS
      debugging format information stored in the file and print it out
-     using a C like syntax.  If no STABS debugging was found this option
+     using a C like syntax.  If no STABS debuging was found this option
      falls back on the '-W' option to print any DWARF information in the
      file.
 
@@ -2085,9 +1983,9 @@ given.
      symbol is encountered.  If there are no matches for SYMBOL then
      nothing will be displayed.
 
-     Note if the '--dwarf=follow-links' option is enabled then any
-     symbol tables in linked debug info files will be read in and used
-     when disassembling.
+     Note if the '--dwarf=follow-links' option has also been enabled
+     then any symbol tables in linked debug info files will be read in
+     and used when disassembling.
 
 '-D'
 '--disassemble-all'
@@ -2107,15 +2005,9 @@ given.
      effect of forcing the disassembler to decode pieces of data found
      in code sections as if they were instructions.
 
-     Note if the '--dwarf=follow-links' option is enabled then any
-     symbol tables in linked debug info files will be read in and used
-     when disassembling.
-
-'--no-addresses'
-     When disassembling, don't print addresses on each line or for
-     symbols and relocation offsets.  In combination with
-     '--no-show-raw-insn' this may be useful for comparing compiler
-     output.
+     Note if the '--dwarf=follow-links' option has also been enabled
+     then any symbol tables in linked debug info files will be read in
+     and used when disassembling.
 
 '--prefix-addresses'
      When disassembling, print the complete address on each line.  This
@@ -2181,13 +2073,6 @@ given.
 '--section=NAME'
      Display information only for section NAME.
 
-'-L'
-'--process-links'
-     Display the contents of non-debug sections found in separate
-     debuginfo files that are linked to the main file.  This option
-     automatically implies the '-WK' option, and only sections requested
-     by other command line options will be displayed.
-
 '-l'
 '--line-numbers'
      Label the display (using debugging information) with the filename
@@ -2228,7 +2113,7 @@ given.
      decimal representation, while the long immediate values are printed
      as hexadecimal.
 
-     'cpu=...' allows one to enforce a particular ISA when disassembling
+     'cpu=...' allows to enforce a particular ISA when disassembling
      instructions, overriding the '-m' value or whatever is in the ELF
      file.  This might be useful to select ARC EM or HS ISA, because
      architecture is same for those and disassembler relies on private
@@ -2265,7 +2150,8 @@ given.
      generated as comments in the disasssembly using '-M notes'.
 
      For the x86, some of the options duplicate functions of the '-m'
-     switch, but allow finer grained control.
+     switch, but allow finer grained control.  Multiple selections from
+     the following may be specified as a comma separated string.
      'x86-64'
      'i386'
      'i8086'
@@ -2295,11 +2181,9 @@ given.
           appear later in the option string.
 
      'suffix'
-          When in AT&T mode and also for a limited set of instructions
-          when in Intel mode, instructs the disassembler to print a
+          When in AT&T mode, instructs the disassembler to print a
           mnemonic suffix even when the suffix could be inferred by the
-          operands or, for certain instructions, the execution mode's
-          defaults.
+          operands.
 
      For PowerPC, the '-M' argument 'raw' selects disasssembly of
      hardware insns rather than aliases.  For example, you will see
@@ -2309,19 +2193,19 @@ given.
      '620', '7400', '7410', '7450', '7455', '750cl', '821', '850',
      '860', 'a2', 'booke', 'booke32', 'cell', 'com', 'e200z4', 'e300',
      'e500', 'e500mc', 'e500mc64', 'e500x2', 'e5500', 'e6500', 'efs',
-     'power4', 'power5', 'power6', 'power7', 'power8', 'power9',
-     'power10', 'ppc', 'ppc32', 'ppc64', 'ppc64bridge', 'ppcps', 'pwr',
-     'pwr2', 'pwr4', 'pwr5', 'pwr5x', 'pwr6', 'pwr7', 'pwr8', 'pwr9',
-     'pwr10', 'pwrx', 'titan', and 'vle'.  '32' and '64' modify the
-     default or a prior CPU selection, disabling and enabling 64-bit
-     insns respectively.  In addition, 'altivec', 'any', 'htm', 'vsx',
-     and 'spe' add capabilities to a previous _or later_ CPU selection.
-     'any' will disassemble any opcode known to binutils, but in cases
-     where an opcode has two different meanings or different arguments,
-     you may not see the disassembly you expect.  If you disassemble
-     without giving a CPU selection, a default will be chosen from
-     information gleaned by BFD from the object files headers, but the
-     result again may not be as you expect.
+     'power4', 'power5', 'power6', 'power7', 'power8', 'power9', 'ppc',
+     'ppc32', 'ppc64', 'ppc64bridge', 'ppcps', 'pwr', 'pwr2', 'pwr4',
+     'pwr5', 'pwr5x', 'pwr6', 'pwr7', 'pwr8', 'pwr9', 'pwrx', 'titan',
+     and 'vle'.  '32' and '64' modify the default or a prior CPU
+     selection, disabling and enabling 64-bit insns respectively.  In
+     addition, 'altivec', 'any', 'htm', 'vsx', and 'spe' add
+     capabilities to a previous _or later_ CPU selection.  'any' will
+     disassemble any opcode known to binutils, but in cases where an
+     opcode has two different meanings or different arguments, you may
+     not see the disassembly you expect.  If you disassemble without
+     giving a CPU selection, a default will be chosen from information
+     gleaned by BFD from the object files headers, but the result again
+     may not be as you expect.
 
      For MIPS, this option controls the printing of instruction mnemonic
      names and register names in disassembled instructions.  Multiple
@@ -2474,8 +2358,8 @@ given.
      If it is necessary to disable the 'visualize-jumps' option after it
      has previously been enabled then use 'visualize-jumps=off'.
 
-'-W[lLiaprmfFsoORtUuTgAckK]'
-'--dwarf[=rawline,=decodedline,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames-interp,=str,=str-offsets,=loc,=Ranges,=pubtypes,=trace_info,=trace_abbrev,=trace_aranges,=gdb_index,=addr,=cu_index,=links,=follow-links]'
+'-W[lLiaprmfFsoRtUuTgAckK]'
+'--dwarf[=rawline,=decodedline,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames-interp,=str,=loc,=Ranges,=pubtypes,=trace_info,=trace_abbrev,=trace_aranges,=gdb_index,=addr,=cu_index,=links,=follow-links]'
 
      Displays the contents of the DWARF debug sections in the file, if
      any are present.  Compressed debug sections are automatically
@@ -2502,7 +2386,7 @@ given.
           Display the raw contents of a '.debug_frame' section.
 
      'F'
-     '=frames-interp'
+     '=frame-interp'
           Display the interpreted contents of a '.debug_frame' section.
 
      'g'
@@ -2518,11 +2402,11 @@ given.
 
      'k'
      '=links'
-          Displays the contents of the '.gnu_debuglink',
-          '.gnu_debugaltlink' and '.debug_sup' sections, if any of them
-          are present.  Also displays any links to separate dwarf object
-          files (dwo), if they are specified by the DW_AT_GNU_dwo_name
-          or DW_AT_dwo_name attributes in the '.debug_info' section.
+          Displays the contents of the '.gnu_debuglink' and/or
+          '.gnu_debugaltlink' sections.  Also displays any links to
+          separate dwarf object files (dwo), if they are specified by
+          the DW_AT_GNU_dwo_name or DW_AT_dwo_name attributes in the
+          '.debug_info' section.
 
      'K'
      '=follow-links'
@@ -2534,18 +2418,6 @@ given.
           In addition, when displaying DWARF attributes, if a form is
           found that references the separate debug info file, then the
           referenced contents will also be displayed.
-
-          Note - in some distributions this option is enabled by
-          default.  It can be disabled via the 'N' debug option.  The
-          default can be chosen when configuring the binutils via the
-          '--enable-follow-debug-links=yes' or
-          '--enable-follow-debug-links=no' options.  If these are not
-          used then the default is to enable the following of debug
-          links.
-
-     'N'
-     '=no-follow-links'
-          Disables the following of links to separate debug info files.
 
      'l'
      '=rawline'
@@ -2566,10 +2438,6 @@ given.
      '=loc'
           Displays the contents of the '.debug_loc' and/or
           '.debug_loclists' sections.
-
-     'O'
-     '=str-offsets'
-          Displays the contents of the '.debug_str_offsets' section.
 
      'p'
      '=pubnames'
@@ -2632,26 +2500,18 @@ given.
 '--dwarf-check'
      Enable additional checks for consistency of Dwarf information.
 
-'--ctf[=SECTION]'
+'--ctf=SECTION'
 
      Display the contents of the specified CTF section.  CTF sections
      themselves contain many subsections, all of which are displayed in
      order.
 
-     By default, display the name of the section named .CTF, which is
-     the name emitted by 'ld'.
+'--ctf-parent=SECTION'
 
-'--ctf-parent=MEMBER'
-
-     If the CTF section contains ambiguously-defined types, it will
-     consist of an archive of many CTF dictionaries, all inheriting from
-     one dictionary containing unambiguous types.  This member is by
-     default named .CTF, like the section containing it, but it is
-     possible to change this name using the
-     'ctf_link_set_memb_name_changer' function at link time.  When
-     looking at CTF archives that have been created by a linker that
-     uses the name changer to rename the parent archive member,
-     '--ctf-parent' can be used to specify the name used for the parent.
+     Specify the name of another section from which the CTF dictionary
+     can inherit types.  (If none is specified, we assume the CTF
+     dictionary inherits types from the default-named member of the
+     archive contained within this section.)
 
 '-G'
 '--stabs'
@@ -2686,7 +2546,7 @@ given.
      entry in the symbol table, the SEC number is the section number,
      the FL value are the symbol's flag bits, the TY number is the
      symbol's type, the SCL number is the symbol's storage class and the
-     NX value is the number of auxiliary entries associated with the
+     NX value is the number of auxilary entries associated with the
      symbol.  The last two fields are the symbol's value and its name.
 
      The other common output format, usually seen with ELF based files,
@@ -2695,7 +2555,7 @@ given.
           00000000 l    d  .bss   00000000 .bss
           00000000 g       .text  00000000 fred
 
-     Here the first number is the symbol's value (sometimes referred to
+     Here the first number is the symbol's value (sometimes refered to
      as its address).  The next field is actually a set of characters
      and spaces indicating the flag bits that are set on the symbol.
      These characters are described below.  Next is the section with
@@ -2770,22 +2630,6 @@ given.
      When displaying symbols include those which the target considers to
      be special in some way and which would not normally be of interest
      to the user.
-
-'-U [D|I|L|E|X|H]'
-'--unicode=[DEFAULT|INVALID|LOCALE|ESCAPE|HEX|HIGHLIGHT]'
-     Controls the display of UTF-8 encoded multibyte characters in
-     strings.  The default ('--unicode=default') is to give them no
-     special treatment.  The '--unicode=locale' option displays the
-     sequence in the current locale, which may or may not support them.
-     The options '--unicode=hex' and '--unicode=invalid' display them as
-     hex byte sequences enclosed by either angle brackets or curly
-     braces.
-
-     The '--unicode=escape' option displays them as escape sequences
-     (\UXXXX) and the '--unicode=highlight' option displays them as
-     escape sequences highlighted in red (if supported by the output
-     device).  The colouring is intended to draw attention to the
-     presence of unicode sequences where they might not be expected.
 
 '-V'
 '--version'
@@ -2981,11 +2825,10 @@ File: binutils.info,  Node: strings,  Next: strip,  Prev: size,  Up: Top
              [-n MIN-LEN] [--bytes=MIN-LEN]
              [-t RADIX] [--radix=RADIX]
              [-e ENCODING] [--encoding=ENCODING]
-             [-U METHOD] [--unicode=METHOD]
              [-] [--all] [--print-file-name]
              [-T BFDNAME] [--target=BFDNAME]
              [-w] [--include-all-whitespace]
-             [-s] [--output-separator SEP_STRING]
+             [-s] [--output-separatorSEP_STRING]
              [--help] [--version] FILE...
 
    For each FILE given, GNU 'strings' prints the printable character
@@ -2995,7 +2838,7 @@ the options below) and are followed by an unprintable character.
    Depending upon how the strings program was configured it will default
 to either displaying all the printable sequences that it can find in
 each file, or only those sequences that are in loadable, initialized
-data sections.  If the file type is unrecognizable, or if strings is
+data sections.  If the file type in unrecognizable, or if strings is
 reading from stdin then it will always display all of the printable
 sequences that it can find.
 
@@ -3040,12 +2883,8 @@ files.
 '-MIN-LEN'
 '-n MIN-LEN'
 '--bytes=MIN-LEN'
-     Print sequences of displayable characters that are at least MIN-LEN
-     characters long.  If not specified a default minimum length of 4 is
-     used.  The distinction between displayable and non-displayable
-     characters depends upon the setting of the '-e' and '-U' options.
-     Sequences are always terminated at control characters such as
-     new-line and carriage-return, but not the tab character.
+     Print sequences of characters that are at least MIN-LEN characters
+     long, instead of the default 4.
 
 '-o'
      Like '-t o'.  Some other versions of 'strings' have '-o' act like
@@ -3067,27 +2906,6 @@ files.
      littleendian, 'B' = 32-bit bigendian, 'L' = 32-bit littleendian.
      Useful for finding wide character strings.  ('l' and 'b' apply to,
      for example, Unicode UTF-16/UCS-2 encodings).
-
-'-U [D|I|L|E|X|H]'
-'--unicode=[DEFAULT|INVALID|LOCALE|ESCAPE|HEX|HIGHLIGHT]'
-     Controls the display of UTF-8 encoded multibyte characters in
-     strings.  The default ('--unicode=default') is to give them no
-     special treatment, and instead rely upon the setting of the
-     '--encoding' option.  The other values for this option
-     automatically enable '--encoding=S'.
-
-     The '--unicode=invalid' option treats them as non-graphic
-     characters and hence not part of a valid string.  All the remaining
-     options treat them as valid string characters.
-
-     The '--unicode=locale' option displays them in the current locale,
-     which may or may not support UTF-8 encoding.  The '--unicode=hex'
-     option displays them as hex byte sequences enclosed between <>
-     characters.  The '--unicode=escape' option displays them as escape
-     sequences (\UXXXX) and the '--unicode=highlight' option displays
-     them as escape sequences highlighted in red (if supported by the
-     output device).  The colouring is intended to draw attention to the
-     presence of unicode sequences where they might not be expected.
 
 '-T BFDNAME'
 '--target=BFDNAME'
@@ -3137,7 +2955,6 @@ File: binutils.info,  Node: strip,  Next: c++filt,  Prev: strings,  Up: Top
            [-o FILE] [-p|--preserve-dates]
            [-D|--enable-deterministic-archives]
            [-U|--disable-deterministic-archives]
-           [--keep-section-symbols]
            [--keep-file-symbols]
            [--only-keep-debug]
            [-v |--verbose] [-V|--version]
@@ -3238,9 +3055,7 @@ modified copies under different names.
      information.
 
 '--strip-unneeded'
-     Remove all symbols that are not needed for relocation processing in
-     addition to debugging symbols and sections stripped by
-     '--strip-debug'.
+     Remove all symbols that are not needed for relocation processing.
 
 '-K SYMBOLNAME'
 '--keep-symbol=SYMBOLNAME'
@@ -3312,11 +3127,6 @@ modified copies under different names.
 '--discard-locals'
      Remove compiler-generated local symbols.  (These usually start with
      'L' or '.'.)
-
-'--keep-section-symbols'
-     When stripping a file, perhaps with '--strip-debug' or
-     '--strip-unneeded', retain any symbols specifying section names,
-     which would otherwise get stripped.
 
 '--keep-file-symbols'
      When stripping a file, perhaps with '--strip-debug' or
@@ -3482,11 +3292,11 @@ trailing after a mangled name.  For example:
 '--no-recursion-limit'
      Enables or disables a limit on the amount of recursion performed
      whilst demangling strings.  Since the name mangling formats allow
-     for an infinite level of recursion it is possible to create strings
-     whose decoding will exhaust the amount of stack space available on
-     the host machine, triggering a memory fault.  The limit tries to
-     prevent this from happening by restricting recursion to 2048 levels
-     of nesting.
+     for an inifinite level of recursion it is possible to create
+     strings whose decoding will exhaust the amount of stack space
+     available on the host machine, triggering a memory fault.  The
+     limit tries to prevent this from happening by restricting recursion
+     to 2048 levels of nesting.
 
      The default is for this limit to be enabled, but disabling it may
      be necessary in order to demangle truly complicated names.  Note
@@ -3678,11 +3488,11 @@ equivalent.
 '--no-recursion-limit'
      Enables or disables a limit on the amount of recursion performed
      whilst demangling strings.  Since the name mangling formats allow
-     for an infinite level of recursion it is possible to create strings
-     whose decoding will exhaust the amount of stack space available on
-     the host machine, triggering a memory fault.  The limit tries to
-     prevent this from happening by restricting recursion to 2048 levels
-     of nesting.
+     for an inifinite level of recursion it is possible to create
+     strings whose decoding will exhaust the amount of stack space
+     available on the host machine, triggering a memory fault.  The
+     limit tries to prevent this from happening by restricting recursion
+     to 2048 levels of nesting.
 
      The default is for this limit to be enabled, but disabling it may
      be necessary in order to demangle truly complicated names.  Note
@@ -3926,18 +3736,15 @@ available to Windows.
 '--preprocessor PROGRAM'
      When 'windres' reads an 'rc' file, it runs it through the C
      preprocessor first.  This option may be used to specify the
-     preprocessor to use.  The default preprocessor is 'gcc'.
+     preprocessor to use, including any leading arguments.  The default
+     preprocessor argument is 'gcc -E -xc-header -DRC_INVOKED'.
 
 '--preprocessor-arg OPTION'
      When 'windres' reads an 'rc' file, it runs it through the C
      preprocessor first.  This option may be used to specify additional
      text to be passed to preprocessor on its command line.  This option
      can be used multiple times to add multiple options to the
-     preprocessor command line.  If the '--preprocessor' option has not
-     been specified then a default set of preprocessor arguments will be
-     used, with any '--preprocessor-arg' options being placed after them
-     on the command line.  These default arguments are '-E',
-     '-xc-header' and '-DRC_INVOKED'.
+     preprocessor command line.
 
 '-I DIRECTORY'
 '--include-dir DIRECTORY'
@@ -4390,12 +4197,7 @@ File: binutils.info,  Node: readelf,  Next: elfedit,  Prev: dlltool,  Up: Top
              [-t|--section-details]
              [-e|--headers]
              [-s|--syms|--symbols]
-             [--dyn-syms|--lto-syms]
-             [--sym-base=[0|8|10|16]]
-             [--demangle=STYLE|--no-demangle]
-             [--quiet]
-             [--recurse-limit|--no-recurse-limit]
-             [-U METHOD|--unicode=METHOD]
+             [--dyn-syms]
              [-n|--notes]
              [-r|--relocs]
              [-u|--unwind]
@@ -4403,17 +4205,13 @@ File: binutils.info,  Node: readelf,  Next: elfedit,  Prev: dlltool,  Up: Top
              [-V|--version-info]
              [-A|--arch-specific]
              [-D|--use-dynamic]
-             [-L|--lint|--enable-checks]
              [-x <number or name>|--hex-dump=<number or name>]
              [-p <number or name>|--string-dump=<number or name>]
              [-R <number or name>|--relocated-dump=<number or name>]
              [-z|--decompress]
              [-c|--archive-index]
-             [-w[lLiaprmfFsoORtUuTgAck]|
-              --debug-dump[=rawline,=decodedline,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames-interp,=str,=str-offsets,=loc,=Ranges,=pubtypes,=trace_info,=trace_abbrev,=trace_aranges,=gdb_index,=addr,=cu_index,=links]]
-             [-wK|--debug-dump=follow-links]
-             [-wN|--debug-dump=no-follow-links]
-             [-P|--process-links]
+             [-w[lLiaprmfFsoRtUuTgAckK]|
+              --debug-dump[=rawline,=decodedline,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames-interp,=str,=loc,=Ranges,=pubtypes,=trace_info,=trace_abbrev,=trace_aranges,=gdb_index,=addr,=cu_index,=links,=follow-links]]
              [--dwarf-depth=N]
              [--dwarf-start=N]
              [--ctf=SECTION]
@@ -4423,7 +4221,6 @@ File: binutils.info,  Node: readelf,  Next: elfedit,  Prev: dlltool,  Up: Top
              [-I|--histogram]
              [-v|--version]
              [-W|--wide]
-             [-T|--silent-truncation]
              [-H|--help]
              ELFFILE...
 
@@ -4462,9 +4259,6 @@ equivalent.  At least one option besides '-v' or '-H' must be given.
      Displays the information contained in the file's segment headers,
      if it has any.
 
-'--quiet'
-     Suppress "no symbols" diagnostic.
-
 '-S'
 '--sections'
 '--section-headers'
@@ -4486,81 +4280,16 @@ equivalent.  At least one option besides '-v' or '-H' must be given.
      Displays the entries in symbol table section of the file, if it has
      one.  If a symbol has version information associated with it then
      this is displayed as well.  The version string is displayed as a
-     suffix to the symbol name, preceded by an @ character.  For example
-     'foo@VER_1'.  If the version is the default version to be used when
-     resolving unversioned references to the symbol then it is displayed
-     as a suffix preceded by two @ characters.  For example
+     suffix to the symbol name, preceeded by an @ character.  For
+     example 'foo@VER_1'.  If the version is the default version to be
+     used when resolving unversioned references to the symbol then it is
+     displayed as a suffix preceeded by two @ characters.  For example
      'foo@@VER_2'.
 
 '--dyn-syms'
      Displays the entries in dynamic symbol table section of the file,
      if it has one.  The output format is the same as the format used by
      the '--syms' option.
-
-'--lto-syms'
-     Displays the contents of any LTO symbol tables in the file.
-
-'--sym-base=[0|8|10|16]'
-     Forces the size field of the symbol table to use the given base.
-     Any unrecognized options will be treated as '0'.  '--sym-base=0'
-     represents the default and legacy behaviour.  This will output
-     sizes as decimal for numbers less than 100000.  For sizes 100000
-     and greater hexadecimal notation will be used with a 0x prefix.
-     '--sym-base=8' will give the symbol sizes in octal.
-     '--sym-base=10' will always give the symbol sizes in decimal.
-     '--sym-base=16' will always give the symbol sizes in hexadecimal
-     with a 0x prefix.
-
-'-C'
-'--demangle[=STYLE]'
-     Decode ("demangle") low-level symbol names into user-level names.
-     This makes C++ function names readable.  Different compilers have
-     different mangling styles.  The optional demangling style argument
-     can be used to choose an appropriate demangling style for your
-     compiler.  *Note c++filt::, for more information on demangling.
-
-'--no-demangle'
-     Do not demangle low-level symbol names.  This is the default.
-
-'--recurse-limit'
-'--no-recurse-limit'
-'--recursion-limit'
-'--no-recursion-limit'
-     Enables or disables a limit on the amount of recursion performed
-     whilst demangling strings.  Since the name mangling formats allow
-     for an infinite level of recursion it is possible to create strings
-     whose decoding will exhaust the amount of stack space available on
-     the host machine, triggering a memory fault.  The limit tries to
-     prevent this from happening by restricting recursion to 2048 levels
-     of nesting.
-
-     The default is for this limit to be enabled, but disabling it may
-     be necessary in order to demangle truly complicated names.  Note
-     however that if the recursion limit is disabled then stack
-     exhaustion is possible and any bug reports about such an event will
-     be rejected.
-
-'-U [D|I|L|E|X|H]'
-'--unicode=[default|invalid|locale|escape|hex|highlight]'
-     Controls the display of non-ASCII characters in identifier names.
-     The default ('--unicode=locale' or '--unicode=default') is to treat
-     them as multibyte characters and display them in the current
-     locale.  All other versions of this option treat the bytes as UTF-8
-     encoded values and attempt to interpret them.  If they cannot be
-     interpreted or if the '--unicode=invalid' option is used then they
-     are displayed as a sequence of hex bytes, encloses in curly
-     parethesis characters.
-
-     Using the '--unicode=escape' option will display the characters as
-     as unicode escape sequences (\UXXXX).  Using the '--unicode=hex'
-     will display the characters as hex byte sequences enclosed between
-     angle brackets.
-
-     Using the '--unicode=highlight' will display the characters as
-     unicode escape sequences but it will also highlighted them in red,
-     assuming that colouring is supported by the output device.  The
-     colouring is intended to draw attention to the presence of unicode
-     sequences when they might not be expected.
 
 '-e'
 '--headers'
@@ -4607,15 +4336,6 @@ equivalent.  At least one option besides '-v' or '-H' must be given.
      When displaying relocations, this option makes 'readelf' display
      the dynamic relocations rather than the static relocations.
 
-'-L'
-'--lint'
-'--enable-checks'
-     Displays warning messages about possible problems with the file(s)
-     being examined.  If used on its own then all of the contents of the
-     file(s) will be examined.  If used with one of the dumping options
-     then the warning messages will only be produced for the things
-     being displayed.
-
 '-x <number or name>'
 '--hex-dump=<number or name>'
      Displays the contents of the indicated section as a hexadecimal
@@ -4650,8 +4370,8 @@ equivalent.  At least one option besides '-v' or '-H' must be given.
      part of binary archives.  Performs the same function as the 't'
      command to 'ar', but without using the BFD library.  *Note ar::.
 
-'-w[lLiaprmfFsOoRtUuTgAckK]'
-'--debug-dump[=rawline,=decodedline,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames-interp,=str,=str-offsets,=loc,=Ranges,=pubtypes,=trace_info,=trace_abbrev,=trace_aranges,=gdb_index,=addr,=cu_index,=links,=follow-links]'
+'-w[lLiaprmfFsoRtUuTgAckK]'
+'--debug-dump[=rawline,=decodedline,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames-interp,=str,=loc,=Ranges,=pubtypes,=trace_info,=trace_abbrev,=trace_aranges,=gdb_index,=addr,=cu_index,=links,=follow-links]'
 
      Displays the contents of the DWARF debug sections in the file, if
      any are present.  Compressed debug sections are automatically
@@ -4678,7 +4398,7 @@ equivalent.  At least one option besides '-v' or '-H' must be given.
           Display the raw contents of a '.debug_frame' section.
 
      'F'
-     '=frames-interp'
+     '=frame-interp'
           Display the interpreted contents of a '.debug_frame' section.
 
      'g'
@@ -4694,11 +4414,11 @@ equivalent.  At least one option besides '-v' or '-H' must be given.
 
      'k'
      '=links'
-          Displays the contents of the '.gnu_debuglink',
-          '.gnu_debugaltlink' and '.debug_sup' sections, if any of them
-          are present.  Also displays any links to separate dwarf object
-          files (dwo), if they are specified by the DW_AT_GNU_dwo_name
-          or DW_AT_dwo_name attributes in the '.debug_info' section.
+          Displays the contents of the '.gnu_debuglink' and/or
+          '.gnu_debugaltlink' sections.  Also displays any links to
+          separate dwarf object files (dwo), if they are specified by
+          the DW_AT_GNU_dwo_name or DW_AT_dwo_name attributes in the
+          '.debug_info' section.
 
      'K'
      '=follow-links'
@@ -4710,18 +4430,6 @@ equivalent.  At least one option besides '-v' or '-H' must be given.
           In addition, when displaying DWARF attributes, if a form is
           found that references the separate debug info file, then the
           referenced contents will also be displayed.
-
-          Note - in some distributions this option is enabled by
-          default.  It can be disabled via the 'N' debug option.  The
-          default can be chosen when configuring the binutils via the
-          '--enable-follow-debug-links=yes' or
-          '--enable-follow-debug-links=no' options.  If these are not
-          used then the default is to enable the following of debug
-          links.
-
-     'N'
-     '=no-follow-links'
-          Disables the following of links to separate debug info files.
 
      'l'
      '=rawline'
@@ -4742,10 +4450,6 @@ equivalent.  At least one option besides '-v' or '-H' must be given.
      '=loc'
           Displays the contents of the '.debug_loc' and/or
           '.debug_loclists' sections.
-
-     'O'
-     '=str-offsets'
-          Displays the contents of the '.debug_str_offsets' section.
 
      'p'
      '=pubnames'
@@ -4805,33 +4509,18 @@ equivalent.  At least one option besides '-v' or '-H' must be given.
 
      This can be used in conjunction with '--dwarf-depth'.
 
-'-P'
-'--process-links'
-     Display the contents of non-debug sections found in separate
-     debuginfo files that are linked to the main file.  This option
-     automatically implies the '-wK' option, and only sections requested
-     by other command line options will be displayed.
-
-'--ctf[=SECTION]'
+'--ctf=SECTION'
 
      Display the contents of the specified CTF section.  CTF sections
      themselves contain many subsections, all of which are displayed in
      order.
 
-     By default, display the name of the section named .CTF, which is
-     the name emitted by 'ld'.
+'--ctf-parent=SECTION'
 
-'--ctf-parent=MEMBER'
-
-     If the CTF section contains ambiguously-defined types, it will
-     consist of an archive of many CTF dictionaries, all inheriting from
-     one dictionary containing unambiguous types.  This member is by
-     default named .CTF, like the section containing it, but it is
-     possible to change this name using the
-     'ctf_link_set_memb_name_changer' function at link time.  When
-     looking at CTF archives that have been created by a linker that
-     uses the name changer to rename the parent archive member,
-     '--ctf-parent' can be used to specify the name used for the parent.
+     Specify the name of another section from which the CTF dictionary
+     can inherit types.  (If none is specified, we assume the CTF
+     dictionary inherits types from the default-named member of the
+     archive contained within this section.)
 '--ctf-symbols=SECTION'
 '--ctf-strings=SECTION'
      Specify the name of another section from which the CTF file can
@@ -4859,15 +4548,6 @@ equivalent.  At least one option besides '-v' or '-H' must be given.
      one a single line, which is far more readable on terminals wider
      than 80 columns.
 
-'-T'
-'--silent-truncation'
-     Normally when readelf is displaying a symbol name, and it has to
-     truncate the name to fit into an 80 column display, it will add a
-     suffix of '[...]' to the name.  This command line option disables
-     this behaviour, allowing 5 more characters of the name to be
-     displayed and restoring the old behaviour of readelf (prior to
-     release 2.35).
-
 '-H'
 '--help'
      Display the command-line options understood by 'readelf'.
@@ -4881,11 +4561,9 @@ File: binutils.info,  Node: elfedit,  Next: Common Options,  Prev: readelf,  Up:
      elfedit [--input-mach=MACHINE]
              [--input-type=TYPE]
              [--input-osabi=OSABI]
-             [--input-abiversion=VERSION]
              --output-mach=MACHINE
              --output-type=TYPE
              --output-osabi=OSABI
-             --output-abiversion=VERSION
              --enable-x86-feature=FEATURE
              --disable-x86-feature=FEATURE
              [-v|--version]
@@ -4902,8 +4580,8 @@ files are supported, as are archives containing ELF files.
 
    The long and short forms of options, shown here as alternatives, are
 equivalent.  At least one of the '--output-mach', '--output-type',
-'--output-osabi', '--output-abiversion', '--enable-x86-feature' and
-'--disable-x86-feature' options must be given.
+'--output-osabi', '--enable-x86-feature' and '--disable-x86-feature'
+options must be given.
 
 '--input-mach=MACHINE'
      Set the matching input ELF machine type to MACHINE.  If
@@ -4939,19 +4617,10 @@ equivalent.  At least one of the '--output-mach', '--output-type',
      Change the ELF OSABI in the ELF header to OSABI.  The supported ELF
      OSABI are the same as '--input-osabi'.
 
-'--input-abiversion=VERSION'
-     Set the matching input ELF file ABIVERSION to VERSION.  VERSION
-     must be between 0 and 255.  If '--input-abiversion' isn't
-     specified, it will match any ELF ABIVERSIONs.
-
-'--output-abiversion=VERSION'
-     Change the ELF ABIVERSION in the ELF header to VERSION.  VERSION
-     must be between 0 and 255.
-
 '--enable-x86-feature=FEATURE'
      Set the FEATURE bit in program property in EXEC or DYN ELF files
      with machine types of I386 or X86-64.  The supported features are,
-     IBT, SHSTK, LAM_U48 and LAM_U57.
+     IBT and SHSTK.
 
 '--disable-x86-feature=FEATURE'
      Clear the FEATURE bit in program property in EXEC or DYN ELF files
@@ -5206,7 +4875,7 @@ recommend you contact that organization first.
 individuals in the file 'etc/SERVICE' in the GNU Emacs distribution.
 
    In any event, we also recommend that you send bug reports for the
-binary utilities to <https://sourceware.org/bugzilla/>.
+binary utilities to <http://www.sourceware.org/bugzilla/>.
 
    The fundamental principle of reporting bugs usefully is this: *report
 all the facts*.  If you are not sure whether to state a fact or leave it
@@ -5832,25 +5501,25 @@ Binutils Index
 * Menu:
 
 * -enable-deterministic-archives:        ar cmdline.          (line 150)
-* -enable-deterministic-archives <1>:    ar cmdline.          (line 238)
-* -enable-deterministic-archives <2>:    objcopy.             (line 359)
-* -enable-deterministic-archives <3>:    objcopy.             (line 369)
+* -enable-deterministic-archives <1>:    ar cmdline.          (line 233)
+* -enable-deterministic-archives <2>:    objcopy.             (line 355)
+* -enable-deterministic-archives <3>:    objcopy.             (line 365)
 * -enable-deterministic-archives <4>:    ranlib.              (line  32)
 * -enable-deterministic-archives <5>:    ranlib.              (line  44)
-* -enable-deterministic-archives <6>:    strip.               (line 158)
-* -enable-deterministic-archives <7>:    strip.               (line 168)
-* .stab:                                 objdump.             (line 727)
-* Add prefix to absolute paths:          objdump.             (line 516)
+* -enable-deterministic-archives <6>:    strip.               (line 155)
+* -enable-deterministic-archives <7>:    strip.               (line 165)
+* .stab:                                 objdump.             (line 684)
+* Add prefix to absolute paths:          objdump.             (line 497)
 * addr2line:                             addr2line.           (line   6)
 * address to file name and line number:  addr2line.           (line   6)
-* all header information, object file:   objdump.             (line 865)
+* all header information, object file:   objdump.             (line 806)
 * ar:                                    ar.                  (line   6)
-* ar compatibility:                      ar.                  (line  63)
-* architecture:                          objdump.             (line 268)
-* architectures available:               objdump.             (line 246)
+* ar compatibility:                      ar.                  (line  60)
+* architecture:                          objdump.             (line 250)
+* architectures available:               objdump.             (line 235)
 * archive contents:                      ranlib.              (line   6)
-* Archive file symbol index information: readelf.             (line 270)
-* archive headers:                       objdump.             (line  79)
+* Archive file symbol index information: readelf.             (line 183)
+* archive headers:                       objdump.             (line  74)
 * archives:                              ar.                  (line   6)
 * base files:                            dlltool.             (line 124)
 * bug criteria:                          Bug Criteria.        (line   6)
@@ -5858,197 +5527,193 @@ Binutils Index
 * bugs:                                  Reporting Bugs.      (line   6)
 * bugs, reporting:                       Bug Reporting.       (line   6)
 * c++filt:                               c++filt.             (line   6)
-* changing object addresses:             objcopy.             (line 406)
-* changing section address:              objcopy.             (line 416)
-* changing section LMA:                  objcopy.             (line 425)
-* changing section VMA:                  objcopy.             (line 438)
-* changing start address:                objcopy.             (line 400)
+* changing object addresses:             objcopy.             (line 400)
+* changing section address:              objcopy.             (line 410)
+* changing section LMA:                  objcopy.             (line 419)
+* changing section VMA:                  objcopy.             (line 432)
+* changing start address:                objcopy.             (line 395)
 * collections of files:                  ar.                  (line   6)
-* Compact Type Format:                   objdump.             (line 705)
-* Compact Type Format <1>:               readelf.             (line 437)
-* compatibility, ar:                     ar.                  (line  63)
+* Compact Type Format:                   objdump.             (line 670)
+* Compact Type Format <1>:               readelf.             (line 327)
+* compatibility, ar:                     ar.                  (line  60)
 * contents of archive:                   ar cmdline.          (line  97)
 * crash:                                 Bug Criteria.        (line   9)
 * creating archives:                     ar cmdline.          (line 144)
-* creating thin archive:                 ar cmdline.          (line 314)
-* CTF:                                   objdump.             (line 705)
-* CTF <1>:                               readelf.             (line 437)
+* creating thin archive:                 ar cmdline.          (line 219)
+* CTF:                                   objdump.             (line 670)
+* CTF <1>:                               readelf.             (line 327)
 * cxxfilt:                               c++filt.             (line  16)
-* dates in archive:                      ar cmdline.          (line 188)
-* debug symbols:                         objdump.             (line 727)
-* debugging symbols:                     nm.                  (line 188)
+* dates in archive:                      ar cmdline.          (line 183)
+* debug symbols:                         objdump.             (line 684)
+* debugging symbols:                     nm.                  (line 153)
 * deleting from archive:                 ar cmdline.          (line  26)
 * demangling C++ symbols:                c++filt.             (line   6)
-* demangling in nm:                      nm.                  (line 196)
-* demangling in nm <1>:                  readelf.             (line 137)
-* demangling in objdump:                 objdump.             (line 107)
+* demangling in nm:                      nm.                  (line 161)
+* demangling in objdump:                 objdump.             (line 102)
 * demangling in objdump <1>:             addr2line.           (line  86)
 * deterministic archives:                ar cmdline.          (line 150)
-* deterministic archives <1>:            ar cmdline.          (line 238)
-* deterministic archives <2>:            objcopy.             (line 359)
-* deterministic archives <3>:            objcopy.             (line 369)
+* deterministic archives <1>:            ar cmdline.          (line 233)
+* deterministic archives <2>:            objcopy.             (line 355)
+* deterministic archives <3>:            objcopy.             (line 365)
 * deterministic archives <4>:            ranlib.              (line  32)
 * deterministic archives <5>:            ranlib.              (line  44)
-* deterministic archives <6>:            strip.               (line 158)
-* deterministic archives <7>:            strip.               (line 168)
-* disassembling object code:             objdump.             (line 148)
-* disassembly architecture:              objdump.             (line 268)
-* disassembly endianness:                objdump.             (line 196)
-* disassembly, with source:              objdump.             (line 505)
-* disassembly, with source <1>:          objdump.             (line 509)
+* deterministic archives <6>:            strip.               (line 155)
+* deterministic archives <7>:            strip.               (line 165)
+* disassembling object code:             objdump.             (line 143)
+* disassembly architecture:              objdump.             (line 250)
+* disassembly endianness:                objdump.             (line 185)
+* disassembly, with source:              objdump.             (line 486)
+* disassembly, with source <1>:          objdump.             (line 490)
 * discarding symbols:                    strip.               (line   6)
 * DLL:                                   dlltool.             (line   6)
 * dlltool:                               dlltool.             (line   6)
-* dynamic relocation entries, in object file: objdump.        (line 493)
-* dynamic symbol table entries, printing: objdump.            (line 826)
-* dynamic symbols:                       nm.                  (line 226)
-* ELF dynamic section information:       readelf.             (line 210)
-* ELF dynamic symbol table information:  readelf.             (line 117)
-* ELF file header information:           readelf.             (line  77)
+* dynamic relocation entries, in object file: objdump.        (line 474)
+* dynamic symbol table entries, printing: objdump.            (line 783)
+* dynamic symbols:                       nm.                  (line 191)
+* ELF dynamic section information:       readelf.             (line 132)
+* ELF dynamic symbol table information:  readelf.             (line 104)
+* ELF file header information:           readelf.             (line  67)
 * ELF file information:                  readelf.             (line   6)
-* ELF notes:                             readelf.             (line 192)
-* ELF object file format:                objdump.             (line 727)
-* ELF program header information:        readelf.             (line  83)
-* ELF reloc information:                 readelf.             (line 196)
-* ELF section group information:         readelf.             (line  97)
-* ELF section information:               readelf.             (line  92)
-* ELF section information <1>:           readelf.             (line 102)
-* ELF segment information:               readelf.             (line  83)
-* ELF symbol table information:          readelf.             (line 107)
-* ELF version sections information:      readelf.             (line 214)
+* ELF notes:                             readelf.             (line 114)
+* ELF object file format:                objdump.             (line 684)
+* ELF program header information:        readelf.             (line  73)
+* ELF reloc information:                 readelf.             (line 118)
+* ELF section group information:         readelf.             (line  84)
+* ELF section information:               readelf.             (line  79)
+* ELF section information <1>:           readelf.             (line  89)
+* ELF segment information:               readelf.             (line  73)
+* ELF symbol table information:          readelf.             (line  94)
+* ELF version sections information:      readelf.             (line 136)
 * elfedit:                               elfedit.             (line   6)
-* endianness:                            objdump.             (line 196)
+* endianness:                            objdump.             (line 185)
 * error on valid input:                  Bug Criteria.        (line  12)
-* external symbols:                      nm.                  (line 238)
-* external symbols <1>:                  nm.                  (line 314)
-* external symbols <2>:                  nm.                  (line 344)
+* external symbols:                      nm.                  (line 203)
+* external symbols <1>:                  nm.                  (line 267)
+* external symbols <2>:                  nm.                  (line 281)
 * extract from archive:                  ar cmdline.          (line 114)
 * fatal signal:                          Bug Criteria.        (line   9)
-* file name:                             nm.                  (line 182)
-* header information, all:               objdump.             (line 865)
+* file name:                             nm.                  (line 147)
+* header information, all:               objdump.             (line 806)
 * input .def file:                       dlltool.             (line 120)
-* input file name:                       nm.                  (line 182)
-* Instruction width:                     objdump.             (line 533)
+* input file name:                       nm.                  (line 147)
+* Instruction width:                     objdump.             (line 514)
 * libraries:                             ar.                  (line  25)
 * listings strings:                      strings.             (line   6)
-* LTO symbol table:                      readelf.             (line 122)
-* machine instructions:                  objdump.             (line 148)
+* machine instructions:                  objdump.             (line 143)
 * moving in archive:                     ar cmdline.          (line  34)
 * MRI compatibility, ar:                 ar scripts.          (line   8)
 * name duplication in archive:           ar cmdline.          (line 108)
 * name length:                           ar.                  (line  18)
 * nm:                                    nm.                  (line   6)
-* nm compatibility:                      nm.                  (line 192)
-* nm compatibility <1>:                  nm.                  (line 232)
-* nm format:                             nm.                  (line 192)
-* nm format <1>:                         nm.                  (line 232)
-* not writing archive index:             ar cmdline.          (line 217)
+* nm compatibility:                      nm.                  (line 157)
+* nm compatibility <1>:                  nm.                  (line 197)
+* nm format:                             nm.                  (line 157)
+* nm format <1>:                         nm.                  (line 197)
+* not writing archive index:             ar cmdline.          (line 212)
 * objdump:                               objdump.             (line   6)
-* objdump inlines:                       nm.                  (line 266)
-* object code format:                    nm.                  (line 398)
-* object code format <1>:                objdump.             (line  93)
+* objdump inlines:                       nm.                  (line 219)
+* object code format:                    nm.                  (line 333)
+* object code format <1>:                objdump.             (line  88)
 * object code format <2>:                size.                (line 103)
-* object code format <3>:                strings.             (line 120)
+* object code format <3>:                strings.             (line  94)
 * object code format <4>:                addr2line.           (line  81)
-* object file header:                    objdump.             (line 202)
+* object file header:                    objdump.             (line 191)
 * object file information:               objdump.             (line   6)
-* object file offsets:                   objdump.             (line 207)
-* object file sections:                  objdump.             (line 500)
-* object formats available:              objdump.             (line 246)
-* offsets of files:                      ar cmdline.          (line 193)
+* object file offsets:                   objdump.             (line 196)
+* object file sections:                  objdump.             (line 481)
+* object formats available:              objdump.             (line 235)
+* offsets of files:                      ar cmdline.          (line 188)
 * operations on archive:                 ar cmdline.          (line  22)
-* plugins:                               ar cmdline.          (line 272)
-* plugins <1>:                           nm.                  (line 347)
+* plugins:                               ar cmdline.          (line 267)
+* plugins <1>:                           nm.                  (line 284)
 * printing from archive:                 ar cmdline.          (line  46)
 * printing strings:                      strings.             (line   6)
 * quick append to archive:               ar cmdline.          (line  54)
-* quiet:                                 readelf.             (line  87)
 * radix for section sizes:               size.                (line  85)
 * ranlib:                                ranlib.              (line   6)
 * ranlib <1>:                            ar cmdline.          (line  91)
 * readelf:                               readelf.             (line   6)
 * relative placement in archive:         ar cmdline.          (line 132)
-* relocation entries, in object file:    objdump.             (line 487)
+* relocation entries, in object file:    objdump.             (line 468)
 * removing symbols:                      strip.               (line   6)
 * repeated names in archive:             ar cmdline.          (line 108)
 * replacement in archive:                ar cmdline.          (line  73)
 * reporting bugs:                        Reporting Bugs.      (line   6)
 * scripts, ar:                           ar scripts.          (line   8)
-* section addresses in objdump:          objdump.             (line  85)
-* section headers:                       objdump.             (line 223)
-* section information:                   objdump.             (line 251)
+* section addresses in objdump:          objdump.             (line  80)
+* section headers:                       objdump.             (line 212)
+* section information:                   objdump.             (line 240)
 * section sizes:                         size.                (line   6)
-* sections, full contents:               objdump.             (line 500)
+* sections, full contents:               objdump.             (line 481)
 * separate debug files:                  debuginfod.          (line   6)
 * size:                                  size.                (line   6)
 * size display format:                   size.                (line  28)
 * size number format:                    size.                (line  85)
-* sorting symbols:                       nm.                  (line 281)
-* source code context:                   objdump.             (line 216)
-* source disassembly:                    objdump.             (line 505)
-* source disassembly <1>:                objdump.             (line 509)
-* source file name:                      nm.                  (line 182)
-* source filenames for object files:     objdump.             (line 262)
-* stab:                                  objdump.             (line 727)
-* start-address:                         objdump.             (line 736)
-* stop-address:                          objdump.             (line 740)
+* sorting symbols:                       nm.                  (line 234)
+* source code context:                   objdump.             (line 205)
+* source disassembly:                    objdump.             (line 486)
+* source disassembly <1>:                objdump.             (line 490)
+* source file name:                      nm.                  (line 147)
+* source filenames for object files:     objdump.             (line 244)
+* stab:                                  objdump.             (line 684)
+* start-address:                         objdump.             (line 693)
+* stop-address:                          objdump.             (line 697)
 * strings:                               strings.             (line   6)
 * strings, printing:                     strings.             (line   6)
 * strip:                                 strip.               (line   6)
-* Strip absolute paths:                  objdump.             (line 519)
-* symbol index:                          ar.                  (line  31)
+* Strip absolute paths:                  objdump.             (line 500)
+* symbol index:                          ar.                  (line  28)
 * symbol index <1>:                      ranlib.              (line   6)
-* symbol index, listing:                 nm.                  (line 303)
-* symbol line numbers:                   nm.                  (line 258)
-* symbol table entries, printing:        objdump.             (line 745)
-* symbol table size base:                readelf.             (line 125)
+* symbol index, listing:                 nm.                  (line 256)
+* symbol line numbers:                   nm.                  (line 211)
+* symbol table entries, printing:        objdump.             (line 702)
 * symbols:                               nm.                  (line   6)
 * symbols, discarding:                   strip.               (line   6)
-* thin archives:                         ar.                  (line  43)
-* undefined symbols:                     nm.                  (line 314)
-* undefined symbols <1>:                 nm.                  (line 344)
+* thin archives:                         ar.                  (line  40)
+* undefined symbols:                     nm.                  (line 267)
+* undefined symbols <1>:                 nm.                  (line 281)
 * Unix compatibility, ar:                ar cmdline.          (line   8)
-* unwind information:                    readelf.             (line 201)
+* unwind information:                    readelf.             (line 123)
 * Update ELF header:                     elfedit.             (line   6)
-* updating an archive:                   ar cmdline.          (line 229)
+* updating an archive:                   ar cmdline.          (line 224)
 * version:                               Top.                 (line   6)
-* VMA in objdump:                        objdump.             (line  85)
-* wide output, printing:                 objdump.             (line 871)
-* writing archive index:                 ar cmdline.          (line 211)
+* VMA in objdump:                        objdump.             (line  80)
+* wide output, printing:                 objdump.             (line 812)
+* writing archive index:                 ar cmdline.          (line 206)
 
 
 
 Tag Table:
 Node: Top1834
 Node: ar3551
-Node: ar cmdline6885
-Node: ar scripts20201
-Node: nm25887
-Node: objcopy41260
-Node: objdump82108
-Node: ranlib117396
-Node: size118995
-Node: strings122964
-Node: strip128821
-Node: c++filt138663
-Ref: c++filt-Footnote-1144524
-Node: addr2line144630
-Node: windmc150308
-Node: windres153967
-Node: dlltool160537
-Node: def file format173534
-Node: readelf176064
-Node: elfedit194353
-Node: Common Options197779
-Node: Selecting the Target System198813
-Node: Target Selection199741
-Node: Architecture Selection201722
-Node: debuginfod202550
-Node: Reporting Bugs203309
-Node: Bug Criteria204071
-Node: Bug Reporting204624
-Node: GNU Free Documentation License211491
-Node: Binutils Index236651
+Node: ar cmdline6704
+Node: ar scripts19330
+Node: nm25016
+Node: objcopy37640
+Node: objdump77841
+Node: ranlib110414
+Node: size112013
+Node: strings115982
+Node: strip120354
+Node: c++filt129879
+Ref: c++filt-Footnote-1135741
+Node: addr2line135847
+Node: windmc141526
+Node: windres145185
+Node: dlltool151544
+Node: def file format164541
+Node: readelf167071
+Node: elfedit179645
+Node: Common Options182601
+Node: Selecting the Target System183635
+Node: Target Selection184563
+Node: Architecture Selection186544
+Node: debuginfod187372
+Node: Reporting Bugs188131
+Node: Bug Criteria188893
+Node: Bug Reporting189446
+Node: GNU Free Documentation License196316
+Node: Binutils Index221476
 
 End Tag Table
 

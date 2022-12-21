@@ -122,7 +122,7 @@ set_property(GLOBAL PROPERTY LLVMBUILD_LIB_DEPS_LTO )
 set_property(GLOBAL PROPERTY LLVMBUILD_LIB_DEPS_Remarks )
 set_property(GLOBAL PROPERTY LLVMBUILD_LIB_DEPS_Polly )
 
-set(TARGET_TRIPLE "x86_64-unknown-linux-gnu")
+set(TARGET_TRIPLE "x86_64-pc-linux-gnu")
 
 set(LLVM_ABI_BREAKING_CHECKS WITH_ASSERTS)
 
@@ -162,8 +162,8 @@ set(LLVM_ENABLE_PIC ON)
 
 set(LLVM_BUILD_32_BITS OFF)
 
-if (NOT "-lpthread" STREQUAL "")
-  set(LLVM_PTHREAD_LIB "-lpthread")
+if (NOT "" STREQUAL "")
+  set(LLVM_PTHREAD_LIB "")
 endif()
 
 set(LLVM_ENABLE_PLUGINS ON)
@@ -196,7 +196,7 @@ set(LLVM_HAVE_OPT_VIEWER_MODULES 0)
 set(LLVM_CONFIGURATION_TYPES )
 set(LLVM_ENABLE_SHARED_LIBS OFF)
 
-set(LLVM_DEFAULT_EXTERNAL_LIT "/drone/src/build/llvm/stage2/./bin/llvm-lit")
+set(LLVM_DEFAULT_EXTERNAL_LIT "/tmp/cirrus-ci-build/build/llvm/stage3/./bin/llvm-lit")
 set(LLVM_LIT_ARGS "-sv")
 
 if(NOT TARGET LLVMSupport)
