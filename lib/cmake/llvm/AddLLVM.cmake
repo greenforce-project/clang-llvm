@@ -25,7 +25,9 @@ function(llvm_update_compile_flags name)
   else()
     if(LLVM_COMPILER_IS_GCC_COMPATIBLE)
       list(APPEND LLVM_COMPILE_FLAGS "-fno-exceptions")
-      if(NOT LLVM_ENABLE_UNWIND_TABLES)
+      if(LLVM_ENABLE_UNWIND_TABLES)
+        list(APPEND LLVM_COMPILE_FLAGS "-funwind-tables")
+      else()
         list(APPEND LLVM_COMPILE_FLAGS "-fno-unwind-tables")
         list(APPEND LLVM_COMPILE_FLAGS "-fno-asynchronous-unwind-tables")
       endif()
@@ -103,11 +105,13 @@ function(add_llvm_symbol_exports target_name export_file)
     # FIXME: Don't write the "local:" line on OpenBSD.
     # in the export file, also add a linker script to version LLVM symbols (form: LLVM_N.M)
     add_custom_command(OUTPUT ${native_export_file}
-      COMMAND echo "LLVM_${LLVM_VERSION_MAJOR} {" > ${native_export_file}
-      COMMAND grep -q "[[:alnum:]]" ${export_file} && echo "  global:" >> ${native_export_file} || :
-      COMMAND sed -e "s/$/;/" -e "s/^/    /" < ${export_file} >> ${native_export_file}
-      COMMAND echo "  local: *;" >> ${native_export_file}
-      COMMAND echo "};" >> ${native_export_file}
+      COMMAND "${Python3_EXECUTABLE}" "-c"
+      "import sys; \
+       lines = ['    ' + l.rstrip() for l in sys.stdin] + ['  local: *;']; \
+       print('LLVM_${LLVM_VERSION_MAJOR} {'); \
+       print('  global:') if len(lines) > 1 else None; \
+       print(';\\n'.join(lines) + '\\n};')"
+      < ${export_file} > ${native_export_file}
       DEPENDS ${export_file}
       VERBATIM
       COMMENT "Creating export file for ${target_name}")
@@ -118,7 +122,7 @@ function(add_llvm_symbol_exports target_name export_file)
       set_property(TARGET ${target_name} APPEND_STRING PROPERTY
                    LINK_FLAGS "  -Wl,--version-script,\"${CMAKE_CURRENT_BINARY_DIR}/${native_export_file}\"")
     endif()
-  else()
+  elseif(WIN32)
     set(native_export_file "${target_name}.def")
 
     add_custom_command(OUTPUT ${native_export_file}
@@ -129,7 +133,18 @@ function(add_llvm_symbol_exports target_name export_file)
       COMMENT "Creating export file for ${target_name}")
     set(export_file_linker_flag "${CMAKE_CURRENT_BINARY_DIR}/${native_export_file}")
     if(MSVC)
+      # cl.exe or clang-cl, i.e. MSVC style command line interface
       set(export_file_linker_flag "/DEF:\"${export_file_linker_flag}\"")
+    elseif(CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
+      # clang in msvc mode, calling a link.exe/lld-link style linker
+      set(export_file_linker_flag "-Wl,/DEF:\"${export_file_linker_flag}\"")
+    elseif(MINGW)
+      # ${export_file_linker_flag}, which is the plain file name, works as is
+      # when passed to the compiler driver, which then passes it on to the
+      # linker as an input file.
+      set(export_file_linker_flag "\"${export_file_linker_flag}\"")
+    else()
+      message(FATAL_ERROR "Unsupported Windows toolchain")
     endif()
     set_property(TARGET ${target_name} APPEND_STRING PROPERTY
                  LINK_FLAGS " ${export_file_linker_flag}")
@@ -212,6 +227,7 @@ if (NOT DEFINED LLVM_LINKER_DETECTED AND NOT WIN32)
   else()
     if("${stdout}" MATCHES "^mold")
       set(LLVM_LINKER_DETECTED YES CACHE INTERNAL "")
+      set(LLVM_LINKER_IS_MOLD YES CACHE INTERNAL "")
       message(STATUS "Linker detection: mold")
     elseif("${stdout}" MATCHES "GNU gold")
       set(LLVM_LINKER_DETECTED YES CACHE INTERNAL "")
@@ -376,19 +392,35 @@ function(set_windows_version_resource_properties name resource_file)
     ${ARGN})
 
   if (NOT DEFINED ARG_VERSION_MAJOR)
-    set(ARG_VERSION_MAJOR ${LLVM_VERSION_MAJOR})
+    if (${LLVM_VERSION_MAJOR})
+      set(ARG_VERSION_MAJOR ${LLVM_VERSION_MAJOR})
+    else()
+      set(ARG_VERSION_MAJOR 0)
+    endif()
   endif()
 
   if (NOT DEFINED ARG_VERSION_MINOR)
-    set(ARG_VERSION_MINOR ${LLVM_VERSION_MINOR})
+    if (${LLVM_VERSION_MINOR})
+      set(ARG_VERSION_MINOR ${LLVM_VERSION_MINOR})
+    else()
+      set(ARG_VERSION_MINOR 0)
+    endif()
   endif()
 
   if (NOT DEFINED ARG_VERSION_PATCHLEVEL)
-    set(ARG_VERSION_PATCHLEVEL ${LLVM_VERSION_PATCH})
+    if (${LLVM_VERSION_PATCH})
+      set(ARG_VERSION_PATCHLEVEL ${LLVM_VERSION_PATCH})
+    else()
+      set(ARG_VERSION_PATCHLEVEL 0)
+    endif()
   endif()
 
   if (NOT DEFINED ARG_VERSION_STRING)
-    set(ARG_VERSION_STRING ${PACKAGE_VERSION})
+    if (${PACKAGE_VERSION})
+      set(ARG_VERSION_STRING ${PACKAGE_VERSION})
+    else()
+      set(ARG_VERSION_STRING 0)
+    endif()
   endif()
 
   if (NOT DEFINED ARG_PRODUCT_NAME)
@@ -899,12 +931,15 @@ macro(generate_llvm_objects name)
 
     list(APPEND ALL_FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-driver.cpp)
 
-    if (LLVM_TOOL_LLVM_DRIVER_BUILD)
+    if (LLVM_TOOL_LLVM_DRIVER_BUILD
+        AND (NOT LLVM_DISTRIBUTION_COMPONENTS OR ${name} IN_LIST LLVM_DISTRIBUTION_COMPONENTS)
+       )
       set_property(GLOBAL APPEND PROPERTY LLVM_DRIVER_COMPONENTS ${LLVM_LINK_COMPONENTS})
       set_property(GLOBAL APPEND PROPERTY LLVM_DRIVER_DEPS ${ARG_DEPENDS} ${LLVM_COMMON_DEPENDS})
       set_property(GLOBAL APPEND PROPERTY LLVM_DRIVER_OBJLIBS "${obj_name}")
 
       set_property(GLOBAL APPEND PROPERTY LLVM_DRIVER_TOOLS ${name})
+      set_property(GLOBAL APPEND PROPERTY LLVM_DRIVER_TOOL_ALIASES_${name} ${name})
       target_link_libraries(${obj_name} ${LLVM_PTHREAD_LIB})
       llvm_config(${obj_name} ${USE_SHARED} ${LLVM_LINK_COMPONENTS} )
     endif()
@@ -1093,7 +1128,8 @@ function(process_llvm_pass_plugins)
           message(FATAL_ERROR "LLVM_INSTALL_PACKAGE_DIR must be defined and writable. GEN_CONFIG should only be passe when building LLVM proper.")
       endif()
       # LLVM_INSTALL_PACKAGE_DIR might be absolute, so don't reuse below.
-      set(llvm_cmake_builddir "${LLVM_LIBRARY_DIR}/cmake/llvm")
+      string(REPLACE "${CMAKE_CFG_INTDIR}" "." llvm_cmake_builddir "${LLVM_LIBRARY_DIR}")
+      set(llvm_cmake_builddir "${llvm_cmake_builddir}/cmake/llvm")
       file(WRITE
           "${llvm_cmake_builddir}/LLVMConfigExtensions.cmake"
           "set(LLVM_STATIC_EXTENSIONS ${LLVM_STATIC_EXTENSIONS})")
@@ -1194,8 +1230,7 @@ function(export_executable_symbols target)
           endif()
           get_target_property(transitive_libs ${lib} INTERFACE_LINK_LIBRARIES)
           foreach(transitive_lib ${transitive_libs})
-            list(FIND link_libs ${transitive_lib} idx)
-            if(TARGET ${transitive_lib} AND idx EQUAL -1)
+            if(TARGET ${transitive_lib} AND NOT ${transitive_lib} IN_LIST link_libs)
               list(APPEND newer_libs ${transitive_lib})
               list(APPEND link_libs ${transitive_lib})
             endif()
@@ -1211,10 +1246,18 @@ function(export_executable_symbols target)
     else()
       set(mangling itanium)
     endif()
+    get_host_tool_path(llvm-nm LLVM_NM llvm_nm_exe llvm_nm_target)
+    get_host_tool_path(llvm-readobj LLVM_READOBJ llvm_readobj_exe llvm_readobj_target)
     add_custom_command(OUTPUT ${exported_symbol_file}
-                       COMMAND "${Python3_EXECUTABLE}" ${LLVM_MAIN_SRC_DIR}/utils/extract_symbols.py ${LLVM_EXTRACT_SYMBOLS_FLAGS} --mangling=${mangling} ${static_libs} -o ${exported_symbol_file}
+                       COMMAND "${Python3_EXECUTABLE}"
+                         ${LLVM_MAIN_SRC_DIR}/utils/extract_symbols.py
+                         --mangling=${mangling} ${static_libs}
+                         -o ${exported_symbol_file}
+                         --nm=${llvm_nm_exe}
+                         --readobj=${llvm_readobj_exe}
                        WORKING_DIRECTORY ${LLVM_LIBRARY_OUTPUT_INTDIR}
-                       DEPENDS ${LLVM_MAIN_SRC_DIR}/utils/extract_symbols.py ${static_libs}
+                       DEPENDS ${LLVM_MAIN_SRC_DIR}/utils/extract_symbols.py
+                         ${static_libs} ${llvm_nm_target} ${llvm_readobj_target}
                        VERBATIM
                        COMMENT "Generating export list for ${target}")
     add_llvm_symbol_exports( ${target} ${exported_symbol_file} )
@@ -1282,6 +1325,10 @@ if(NOT LLVM_TOOLCHAIN_TOOLS)
     strings
     strip
     )
+  # Build llvm-mt if libxml2 is enabled. Can be used by runtimes.
+  if (LLVM_ENABLE_LIBXML2)
+    list(APPEND LLVM_TOOLCHAIN_TOOLS llvm-mt)
+  endif()
 endif()
 
 macro(llvm_add_tool project name)
@@ -1289,7 +1336,10 @@ macro(llvm_add_tool project name)
   if( NOT LLVM_BUILD_TOOLS )
     set(EXCLUDE_FROM_ALL ON)
   endif()
-  if(ARG_GENERATE_DRIVER AND LLVM_TOOL_LLVM_DRIVER_BUILD)
+  if(ARG_GENERATE_DRIVER
+     AND LLVM_TOOL_LLVM_DRIVER_BUILD
+     AND (NOT LLVM_DISTRIBUTION_COMPONENTS OR ${name} IN_LIST LLVM_DISTRIBUTION_COMPONENTS)
+    )
     generate_llvm_objects(${name} ${ARGN})
     add_custom_target(${name} DEPENDS llvm-driver)
   else()
@@ -2007,21 +2057,29 @@ function(llvm_install_library_symlink name dest type)
   set(full_name ${CMAKE_${type}_LIBRARY_PREFIX}${name}${CMAKE_${type}_LIBRARY_SUFFIX})
   set(full_dest ${CMAKE_${type}_LIBRARY_PREFIX}${dest}${CMAKE_${type}_LIBRARY_SUFFIX})
 
+  if(LLVM_USE_SYMLINKS)
+    set(LLVM_LINK_OR_COPY create_symlink)
+  else()
+    set(LLVM_LINK_OR_COPY copy)
+  endif()
+
   set(output_dir lib${LLVM_LIBDIR_SUFFIX})
   if(WIN32 AND "${type}" STREQUAL "SHARED")
     set(output_dir "${CMAKE_INSTALL_BINDIR}")
   endif()
 
   install(SCRIPT ${INSTALL_SYMLINK}
-          CODE "install_symlink(\"${full_name}\" \"${full_dest}\" \"${output_dir}\")"
+          CODE "install_symlink(\"${full_name}\" \"${full_dest}\" \"${output_dir}\" \"${LLVM_LINK_OR_COPY}\")"
           COMPONENT ${component})
 
 endfunction()
 
 function(llvm_install_symlink project name dest)
   get_property(LLVM_DRIVER_TOOLS GLOBAL PROPERTY LLVM_DRIVER_TOOLS)
-  if(LLVM_TOOL_LLVM_DRIVER_BUILD AND ${dest} IN_LIST LLVM_DRIVER_TOOLS)
-    set_property(GLOBAL APPEND PROPERTY LLVM_DRIVER_TOOL_SYMLINKS ${name})
+  if(LLVM_TOOL_LLVM_DRIVER_BUILD
+     AND ${dest} IN_LIST LLVM_DRIVER_TOOLS
+     AND (NOT LLVM_DISTRIBUTION_COMPONENTS OR ${dest} IN_LIST LLVM_DISTRIBUTION_COMPONENTS)
+    )
     return()
   endif()
   cmake_parse_arguments(ARG "ALWAYS_GENERATE" "COMPONENT" "" ${ARGN})
@@ -2048,10 +2106,16 @@ function(llvm_install_symlink project name dest)
     set(full_dest llvm${CMAKE_EXECUTABLE_SUFFIX})
   endif()
 
+  if(LLVM_USE_SYMLINKS)
+    set(LLVM_LINK_OR_COPY create_symlink)
+  else()
+    set(LLVM_LINK_OR_COPY copy)
+  endif()
+
   set(output_dir "${${project}_TOOLS_INSTALL_DIR}")
 
   install(SCRIPT ${INSTALL_SYMLINK}
-          CODE "install_symlink(\"${full_name}\" \"${full_dest}\" \"${output_dir}\")"
+          CODE "install_symlink(\"${full_name}\" \"${full_dest}\" \"${output_dir}\" \"${LLVM_LINK_OR_COPY}\")"
           COMPONENT ${component})
 
   if (NOT LLVM_ENABLE_IDE AND NOT ARG_ALWAYS_GENERATE)
@@ -2068,11 +2132,7 @@ function(llvm_add_tool_symlink project link_name target)
   get_property(LLVM_DRIVER_TOOLS GLOBAL PROPERTY LLVM_DRIVER_TOOLS)
 
   if (${target} IN_LIST LLVM_DRIVER_TOOLS)
-    string(REPLACE "-" "_" tool_entry ${target})
-    string(REPLACE "-" "_" key ${link_name})
-    string(REPLACE "llvm-" "" tool_name ${link_name})
-    set_property(GLOBAL APPEND_STRING PROPERTY
-                 LLVM_EXTRA_DRIVER_ENTRIES "LLVM_DRIVER_TOOL(\"${tool_name}\", ${tool_entry})\n")
+    set_property(GLOBAL APPEND PROPERTY LLVM_DRIVER_TOOL_ALIASES_${target} ${link_name})
   endif()
   set(dest_binary "$<TARGET_FILE:${target}>")
 
@@ -2086,7 +2146,7 @@ function(llvm_add_tool_symlink project link_name target)
   if(NOT ARG_OUTPUT_DIR)
     # If you're not overriding the OUTPUT_DIR, we can make the link relative in
     # the same directory.
-    if(CMAKE_HOST_UNIX)
+    if(LLVM_USE_SYMLINKS)
       set(dest_binary "$<TARGET_FILE_NAME:${target}>")
     endif()
     if(CMAKE_CONFIGURATION_TYPES)
@@ -2112,7 +2172,7 @@ function(llvm_add_tool_symlink project link_name target)
     endif()
   endif()
 
-  if(CMAKE_HOST_UNIX)
+  if(LLVM_USE_SYMLINKS)
     set(LLVM_LINK_OR_COPY create_symlink)
   else()
     set(LLVM_LINK_OR_COPY copy)
@@ -2286,7 +2346,8 @@ function(llvm_setup_rpath name)
     # FIXME: update this when there is better solution.
     set(_install_rpath "${LLVM_LIBRARY_OUTPUT_INTDIR}" "${CMAKE_INSTALL_PREFIX}/lib${LLVM_LIBDIR_SUFFIX}" ${extra_libdir})
   elseif(UNIX)
-    set(_install_rpath "\$ORIGIN/../lib${LLVM_LIBDIR_SUFFIX}" ${extra_libdir})
+    set(_build_rpath "\$ORIGIN/../lib${LLVM_LIBDIR_SUFFIX}" ${extra_libdir})
+    set(_install_rpath "\$ORIGIN/../lib${LLVM_LIBDIR_SUFFIX}")
     if(${CMAKE_SYSTEM_NAME} MATCHES "(FreeBSD|DragonFly)")
       set_property(TARGET ${name} APPEND_STRING PROPERTY
                    LINK_FLAGS " -Wl,-z,origin ")
@@ -2300,9 +2361,16 @@ function(llvm_setup_rpath name)
     return()
   endif()
 
-  # Enable BUILD_WITH_INSTALL_RPATH unless CMAKE_BUILD_RPATH is set.
+  # Enable BUILD_WITH_INSTALL_RPATH unless CMAKE_BUILD_RPATH is set and not
+  # building for macOS or AIX, as those platforms seemingly require it.
+  # On AIX, the tool chain doesn't support modifying rpaths/libpaths for XCOFF
+  # on install at the moment, so BUILD_WITH_INSTALL_RPATH is required.
   if("${CMAKE_BUILD_RPATH}" STREQUAL "")
-    set_property(TARGET ${name} PROPERTY BUILD_WITH_INSTALL_RPATH ON)
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin|AIX")
+      set_property(TARGET ${name} PROPERTY BUILD_WITH_INSTALL_RPATH ON)
+    else()
+      set_property(TARGET ${name} APPEND PROPERTY BUILD_RPATH "${_build_rpath}")
+    endif()
   endif()
 
   set_target_properties(${name} PROPERTIES
@@ -2360,5 +2428,40 @@ function(find_first_existing_vc_file path out_var)
       endif()
       set(${out_var} "${git_dir}/logs/HEAD" PARENT_SCOPE)
     endif()
+  endif()
+endfunction()
+
+function(get_host_tool_path tool_name setting_name exe_var_name target_var_name)
+  set(${setting_name}_DEFAULT "")
+
+  if(LLVM_NATIVE_TOOL_DIR)
+    if(EXISTS "${LLVM_NATIVE_TOOL_DIR}/${tool_name}${LLVM_HOST_EXECUTABLE_SUFFIX}")
+      set(${setting_name}_DEFAULT "${LLVM_NATIVE_TOOL_DIR}/${tool_name}${LLVM_HOST_EXECUTABLE_SUFFIX}")
+    endif()
+  endif()
+
+  set(${setting_name} "${${setting_name}_DEFAULT}" CACHE
+    STRING "Host ${tool_name} executable. Saves building if cross-compiling.")
+
+  if(${setting_name})
+    set(exe_name ${${setting_name}})
+    set(target_name "")
+  elseif(LLVM_USE_HOST_TOOLS)
+    get_native_tool_path(${tool_name} exe_name)
+    set(target_name ${exe_name})
+  else()
+    set(exe_name $<TARGET_FILE:${tool_name}>)
+    set(target_name ${tool_name})
+  endif()
+  set(${exe_var_name} "${exe_name}" CACHE STRING "")
+  set(${target_var_name} "${target_name}" CACHE STRING "")
+endfunction()
+
+function(setup_host_tool tool_name setting_name exe_var_name target_var_name)
+  get_host_tool_path(${tool_name} ${setting_name} ${exe_var_name} ${target_var_name})
+  # Set up a native tool build if necessary
+  if(LLVM_USE_HOST_TOOLS AND NOT ${setting_name})
+    build_native_tool(${tool_name} exe_name DEPENDS ${tool_name})
+    add_custom_target(${target_var_name} DEPENDS ${exe_name})
   endif()
 endfunction()
